@@ -3,6 +3,7 @@ package br.com.estaghub.mapper.impl;
 import br.com.estaghub.domain.Discente;
 import br.com.estaghub.dto.DiscenteCreationDTO;
 import br.com.estaghub.dto.DiscenteNovoPedidoCreationDTO;
+import br.com.estaghub.dto.DiscenteRenovacaoPedidoCreationDTO;
 import br.com.estaghub.mapper.DiscenteMapper;
 import org.mapstruct.Mapper;
 import org.mapstruct.factory.Mappers;
@@ -31,6 +32,19 @@ public class DiscenteMapperImpl implements DiscenteMapper {
                 .cargaHorariaCumprida(discenteNovoPedidoCreationDTO.getCargaHorariaCumprida())
                 .endereco(discenteNovoPedidoCreationDTO.getEndereco())
                 .curso(discenteNovoPedidoCreationDTO.getCurso())
+                .build();
+    }
+
+    @Override
+    public Discente toDiscenteCreateRenovacaoEstagio(DiscenteRenovacaoPedidoCreationDTO discenteRenovacaoPedidoCreationDTO) {
+        return Discente.builder().cpf(discenteRenovacaoPedidoCreationDTO.getCpf())
+                .rg(discenteRenovacaoPedidoCreationDTO.getRg())
+                .orgaoExpedidorRg(discenteRenovacaoPedidoCreationDTO.getOrgaoExpedidorRg())
+                .ira(discenteRenovacaoPedidoCreationDTO.getIra())
+                .periodo(discenteRenovacaoPedidoCreationDTO.getPeriodo())
+                .cargaHorariaCumprida(discenteRenovacaoPedidoCreationDTO.getCargaHorariaCumprida())
+                .endereco(discenteRenovacaoPedidoCreationDTO.getEndereco())
+                .curso(discenteRenovacaoPedidoCreationDTO.getCurso())
                 .build();
     }
 }

@@ -20,7 +20,7 @@
         function logoutDocenteComissao(){
             $.ajax({
                 type: "POST",
-                url: "docenteComissaoController",
+                url: "docenteController",
                 data: {
                     buttonLogoutDocenteComissao: $('button[id^=buttonLogoutDocenteComissao]').val()
                 }
@@ -66,7 +66,7 @@
 
         <!-- Nav Item - Criar Docente Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="renovacaoEstagio.jsp">
+            <a class="nav-link collapsed" href="criarDocente.jsp">
                 <i class="fas fa-fw fa-wrench"></i>
                 <span>Criar Docente</span>
             </a>
@@ -74,14 +74,14 @@
 
         <!-- Nav Item - Criar Curso Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="statusProcesso.jsp">
+            <a class="nav-link collapsed" href="criarCurso.jsp">
                 <i class="fas fa-fw fa-wrench"></i>
                 <span>Criar Curso</span>
             </a>
         </li>
         <!-- Nav Item - Criar Departamento Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="statusProcesso.jsp">
+            <a class="nav-link collapsed" href="criarDepartamento.jsp">
                 <i class="fas fa-fw fa-wrench"></i>
                 <span>Criar Departamento</span>
             </a>

@@ -1,6 +1,5 @@
 package br.com.estaghub.domain;
 
-import br.com.estaghub.repository.impl.DiscenteRepositoryImpl;
 import br.com.estaghub.repository.impl.DocenteRepositoryImpl;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -56,5 +55,17 @@ public class Docente {
     public Optional<Docente> getDocenteByEmail(String email){
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         return docenteRepository.getDocenteByEmail(email);
+    }
+    public List<Docente> getAllDocentes(){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        return docenteRepository.getAllDocentes();
+    }
+    public List<Docente> getAllDocentesNoComissao(){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        return docenteRepository.getAllDocentesNoComissao();
+    }
+    public Docente getDocenteById(Long id){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        return docenteRepository.getDocenteById(id);
     }
 }

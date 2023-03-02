@@ -2,6 +2,7 @@ package br.com.estaghub.repository.impl;
 
 import br.com.estaghub.domain.Discente;
 import br.com.estaghub.domain.Docente;
+import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.repository.DocenteRepository;
 import br.com.estaghub.util.CryptUtil;
 
@@ -9,6 +10,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
+import java.util.List;
 import java.util.Optional;
 
 public class DocenteRepositoryImpl implements DocenteRepository {
@@ -21,16 +23,23 @@ public class DocenteRepositoryImpl implements DocenteRepository {
 
     @Override
     public void criarDocente(Docente docente) {
-//        TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
-//        query.setParameter("email", discente.getEmail());
-//        if (query.getResultList().isEmpty()){
-//            discente.setSenha(CryptUtil.encryptPassword(discente.getSenha()));
-//            em.getTransaction().begin();
-//            em.persist(discente);
-//            em.getTransaction().commit();
-//        }
+        TypedQuery<Docente> query = em.createQuery("SELECT d FROM Docente d WHERE d.email = :email", Docente.class);
+        query.setParameter("email", docente.getEmail());
+        if (query.getResultList().isEmpty()){
+            docente.setSenha(CryptUtil.encryptPassword(docente.getSenha()));
+            em.getTransaction().begin();
+            em.persist(docente);
+            em.getTransaction().commit();
+        }
+        em.close();
+        emf.close();
+    }
+    @Override
+    public Docente getDocenteById(Long id) {
+        Docente docente = em.find(Docente.class,id);
 //        em.close();
 //        emf.close();
+        return docente;
     }
 
     @Override
@@ -56,5 +65,13 @@ public class DocenteRepositoryImpl implements DocenteRepository {
         TypedQuery<Docente> query = em.createQuery("SELECT d FROM Docente d WHERE d.email = :email", Docente.class);
         query.setParameter("email", email);
         return Optional.ofNullable(query.getSingleResult());
+    }
+    @Override
+    public List<Docente> getAllDocentes() {
+        return em.createQuery("SELECT d FROM Docente d ", Docente.class).getResultList();
+    }
+    @Override
+    public List<Docente> getAllDocentesNoComissao() {
+        return em.createQuery("SELECT d FROM Docente d where d.isDocenteComissao <> 1", Docente.class).getResultList();
     }
 }

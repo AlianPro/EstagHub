@@ -11,5 +11,6 @@ public interface DiscenteRepository {
     Optional<Discente> getDiscenteByEmail(String email);
     Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido);
     void addInfoNovoPedidoInDiscente(Discente discente);
+    Discente getDiscenteById(Long id);
 
 }

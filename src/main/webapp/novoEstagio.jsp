@@ -38,66 +38,13 @@
                             if (!formLogin.checkValidity()) {
                                 event.preventDefault();
                                 event.stopPropagation();
-                                // return false;
-                            }else{
-                                // $.ajax({
-                                //     type: "POST",
-                                //     url: "discenteController",
-                                //     data: {
-                                //         submitButtonDiscenteCadastroNovoEstagio1: 'step1',
-                                //         cpfDiscente: $('input[id^=cpfDiscente]').val(),
-                                //         rgDiscente: $('input[id^=rgDiscente]').val(),
-                                //         orgaoExpedidorRgDiscente: $('input[id^=orgaoExpedidorRgDiscente]').val(),
-                                //         iraDiscente: $('input[id^=iraDiscente]').val(),
-                                //         periodoDiscente: $('input[id^=periodoDiscente]').val(),
-                                //         cargaHorariaCumpridaDiscente: $('input[id^=cargaHorariaCumpridaDiscente]').val(),
-                                //         selectCursoDiscente: $('select[id^=selectCurso]').val()
-                                //     }
-                                // });
-                                // return false;
-                                // window.location='discente.jsp';
-                                // document.getElementById("discenteForm").reset();
                             }
                             formLogin.classList.add('was-validated');
                         }, false);
                     });
                 }
             });
-            // let formLogin = document.getElementById('discenteForm');
-            // if(formLogin) {
-            //     const forms = document.querySelectorAll('.needs-validation');
-            //     Array.prototype.slice.call(forms).forEach((formLogin) => {
-            //         formLogin.addEventListener('submit', (event) => {
-            //             if (!formLogin.checkValidity()) {
-            //                 event.preventDefault();
-            //                 event.stopPropagation();
-            //             }
-            //             formLogin.classList.add('was-validated');
-            //         }, false);
-            //     });
-            // }
         });
-        // $(function() {
-        //     function sendNextStep() {
-        //         let formLogin = document.getElementById('discenteForm');
-        //         if (formLogin) {
-        //             const forms = document.querySelectorAll('.needs-validation');
-        //             Array.prototype.slice.call(forms).forEach((formLogin) => {
-        //                 formLogin.addEventListener('submit', (event) => {
-        //                     if (!formLogin.checkValidity()) {
-        //                         event.preventDefault();
-        //                         event.stopPropagation();
-        //                         return false;
-        //                     } else {
-        //                         alert("dadsd");
-        //                         return true;
-        //                     }
-        //                     formLogin.classList.add('was-validated');
-        //                 }, false);
-        //             });
-        //         }
-        //     }
-        // });
         function goToNextStep(){
             let formLogin = document.getElementById('discenteForm');
             if(formLogin) {
@@ -111,23 +58,6 @@
                         }else{
                             return true;
                         }
-                        // else{
-                        //     $.ajax({
-                        //         type: "POST",
-                        //         url: "discenteController",
-                        //         data: {
-                        //             submitButtonDiscenteCadastroNovoEstagio1: 'step1',
-                        //             cpfDiscente: $('input[id^=cpfDiscente]').val(),
-                        //             rgDiscente: $('input[id^=rgDiscente]').val(),
-                        //             orgaoExpedidorRgDiscente: $('input[id^=orgaoExpedidorRgDiscente]').val(),
-                        //             iraDiscente: $('input[id^=iraDiscente]').val(),
-                        //             periodoDiscente: $('input[id^=periodoDiscente]').val(),
-                        //             cargaHorariaCumpridaDiscente: $('input[id^=cargaHorariaCumpridaDiscente]').val(),
-                        //             selectCursoDiscente: $('select[id^=selectCurso]').val()
-                        //         }
-                        //     });
-                        //     return true;
-                        // }
                         formLogin.classList.add('was-validated');
                     }, false);
                 });
@@ -176,27 +106,146 @@
 
         <!-- Nav Item - Novo estágio Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="#">
-                <i class="fas fa-fw fa-cog"></i>
-                <span>Novo Estágio</span>
-            </a>
+            <c:choose>
+                <c:when test="${RENOVACAO_ESTAGIO == null}">
+                    <c:choose>
+                        <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name()}">
+                            <%--                    TODO tela para avisar q está esperando resposta do docente--%>
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP2' == NOVO_ESTAGIO.status.name()}">
+                            <%--TODO tela para avisar q está esperando resposta do docente--%>
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP2_REJEITADO' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name()}">
+                            <%--TODO tela para avisar q está esperando resposta do docente--%>
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP3' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP4' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP4_TCE' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_PEDIDO_FIM' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:otherwise>
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="novoEstagio.jsp">
+                                <i class="fas fa-fw fa-cog"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:otherwise>
+                    </c:choose>
+                </c:when>
+            </c:choose>
         </li>
 
         <!-- Nav Item - Renovação de estágio Collapse Menu -->
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#">
-                <i class="fas fa-fw fa-wrench"></i>
-                <span>Renovação de Estágio</span>
-            </a>
-        </li>
+        <c:choose>
+            <c:when test="${NOVO_ESTAGIO == null}">
+                <c:choose>
+                    <c:when test="${'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name()}">
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="#">
+                                <i class="fas fa-fw fa-wrench"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:when test="${'RENOVACAO_STEP3_REJEITADO' == RENOVACAO_ESTAGIO.status.name()}">
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
+                                <i class="fas fa-fw fa-wrench"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:when test="${'RENOVACAO_STEP4' == RENOVACAO_ESTAGIO.status.name()}">
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="emitirTermoAditivo.jsp">
+                                <i class="fas fa-fw fa-wrench"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:when test="${'NOVO_PEDIDO_FIM' == RENOVACAO_ESTAGIO.status.name()}">
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="#">
+                                <i class="fas fa-fw fa-wrench"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:otherwise>
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="renovacaoEstagio.jsp">
+                                <i class="fas fa-fw fa-wrench"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:otherwise>
+                </c:choose>
+            </c:when>
+        </c:choose>
 
-        <!-- Nav Item - Status Collapse Menu -->
-        <li class="nav-item">
-            <a class="nav-link collapsed" href="#">
-                <i class="fas fa-fw fa-wrench"></i>
-                <span>Status</span>
-            </a>
-        </li>
+        <c:if test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name() || 'RENOVACAO_STEP4_DISCENTE_ASSINADO' == RENOVACAO_ESTAGIO.status.name()}">
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
+                    <i class="fas fa-fw fa-wrench"></i>
+                    <span>Assinar Documentos</span>
+                </a>
+            </li>
+        </c:if>
+
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
 

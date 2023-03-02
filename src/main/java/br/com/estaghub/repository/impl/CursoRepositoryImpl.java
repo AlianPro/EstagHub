@@ -1,9 +1,7 @@
 package br.com.estaghub.repository.impl;
 
 import br.com.estaghub.domain.Curso;
-import br.com.estaghub.domain.Discente;
 import br.com.estaghub.repository.CursoRepository;
-import br.com.estaghub.util.CryptUtil;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -20,19 +18,18 @@ public class CursoRepositoryImpl implements CursoRepository {
         this.em = this.emf.createEntityManager();
     }
 
-//    @Override
-//    public void criarCurso(Curso curso) {
-//        TypedQuery<Curso> query = em.createQuery("SELECT c FROM Curso c WHERE c.nome = :nome", Curso.class);
-//        query.setParameter("email", discente.getEmail());
-//        if (query.getResultList().isEmpty()){
-//            discente.setSenha(CryptUtil.encryptPassword(discente.getSenha()));
-//            em.getTransaction().begin();
-//            em.persist(discente);
-//            em.getTransaction().commit();
-//        }
-//        em.close();
-//        emf.close();
-//    }
+    @Override
+    public void criarCurso(Curso curso) {
+        TypedQuery<Curso> query = em.createQuery("SELECT c FROM Curso c WHERE c.nome = :nome", Curso.class);
+        query.setParameter("nome", curso.getNome());
+        if (query.getResultList().isEmpty()){
+            em.getTransaction().begin();
+            em.persist(curso);
+            em.getTransaction().commit();
+        }
+        em.close();
+        emf.close();
+    }
 
     @Override
     public Optional<Curso> getCursoById(Long id) {

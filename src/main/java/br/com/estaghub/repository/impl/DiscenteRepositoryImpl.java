@@ -2,13 +2,11 @@ package br.com.estaghub.repository.impl;
 
 import br.com.estaghub.domain.Discente;
 import br.com.estaghub.domain.Pedido;
-import br.com.estaghub.domain.Supervisor;
 import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.repository.DiscenteRepository;
 import br.com.estaghub.util.CryptUtil;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.Optional;
 
 public class DiscenteRepositoryImpl implements DiscenteRepository {
@@ -31,6 +29,13 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
         }
         em.close();
         emf.close();
+    }
+    @Override
+    public Discente getDiscenteById(Long id) {
+        Discente discente = em.find(Discente.class,id);
+//        em.close();
+//        emf.close();
+        return discente;
     }
 
     @Override

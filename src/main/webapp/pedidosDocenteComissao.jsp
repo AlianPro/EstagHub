@@ -17,12 +17,31 @@
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.css" rel="stylesheet">
     <script>
-        function logoutDocenteComissao(){
+        function sendNextPage(idPedido, statusPedido){
             $.ajax({
                 type: "POST",
-                url: "docenteComissaoController",
+                url: "docenteController",
                 data: {
-                    buttonLogoutDocenteComissao: $('button[id^=buttonLogoutDocenteComissao]').val()
+                    buttonPedido: 'pedido',
+                    idPedido: idPedido,
+                    statusPedido: statusPedido
+                },
+                success: function (){
+                    if('NOVO_STEP1' === statusPedido){
+                        window.location.replace("novoStep2.jsp");
+                    }else if('NOVO_STEP2' === statusPedido){
+                        alert("Pedido em andamento!");
+                    }else if('NOVO_STEP2_REJEITADO' === statusPedido){
+                        alert("Aguardando a Justificativa do(a) Discente");
+                    }else if('NOVO_STEP2_JUSTIFICADO' === statusPedido){
+                        window.location.replace("novoStep2Justificado.jsp");
+                    }else if('NOVO_STEP3' === statusPedido){
+                        window.location.replace("novoStep2.jsp");
+                    }else if('RENOVACAO_STEP2' === statusPedido){
+                        window.location.replace("novoStep2.jsp");
+                    }else if('RENOVACAO_STEP3_JUSTIFICADO' === statusPedido){
+                        window.location.replace("novoStep2Justificado.jsp");
+                    }
                 }
             });
         }
@@ -58,7 +77,7 @@
 
         <!-- Nav Item - Pedidos Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="novoEstagio.jsp">
+            <a class="nav-link collapsed" href="pedidosDocenteComissao.jsp">
                 <i class="fas fa-fw fa-cog"></i>
                 <span>Pedidos</span>
             </a>
@@ -66,7 +85,7 @@
 
         <!-- Nav Item - Criar Docente Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="renovacaoEstagio.jsp">
+            <a class="nav-link collapsed" href="criarDocente.jsp">
                 <i class="fas fa-fw fa-wrench"></i>
                 <span>Criar Docente</span>
             </a>
@@ -74,14 +93,14 @@
 
         <!-- Nav Item - Criar Curso Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="statusProcesso.jsp">
+            <a class="nav-link collapsed" href="criarCurso.jsp">
                 <i class="fas fa-fw fa-wrench"></i>
                 <span>Criar Curso</span>
             </a>
         </li>
         <!-- Nav Item - Criar Departamento Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="statusProcesso.jsp">
+            <a class="nav-link collapsed" href="criarDepartamento.jsp">
                 <i class="fas fa-fw fa-wrench"></i>
                 <span>Criar Departamento</span>
             </a>
@@ -163,21 +182,41 @@
                                                     <div class="card-body">
                                                         <h5 class="card-title">Novo Pedido Estágio - ${pedido.id}</h5>
                                                         <p class="card-text">${pedido.discente.getNome()}</p>
-                                                        <a href="#" class="btn btn-primary">Avançar</a>
+                                                        <c:choose>
+                                                            <c:when test="${'NOVO_STEP1' == pedido.status.name()}">
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </c:when>
+                                                            <c:when test="${'NOVO_STEP2_REJEITADO' == pedido.status.name()}">
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </c:when>
+                                                            <c:when test="${'NOVO_STEP2_JUSTIFICADO' == pedido.status.name()}">
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </c:when>
+                                                            <c:when test="${'NOVO_STEP2' == pedido.status.name()}">
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </c:when>
+                                                            <c:when test="${'NOVO_STEP3' == pedido.status.name()}">
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </c:when>
+                                                        </c:choose>
                                                     </div>
                                                 </div>
                                             </div>
                                         </c:when>
                                         <c:when test="${'RENOVACAO' == pedido.tipo.name()}">
-                                            <div class="col">
-                                                <div class="card" style="text-align: center">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">Renovação Estágio - ${pedido.id}</h5>
-                                                        <p class="card-text">${pedido.discente.getNome()}</p>
-                                                        <a href="#" class="btn btn-primary">Avançar</a>
+                                            <c:choose>
+                                                <c:when test="${'RENOVACAO_STEP2' == pedido.status.name() || 'RENOVACAO_STEP3_JUSTIFICADO' == pedido.status.name()}">
+                                                    <div class="col">
+                                                        <div class="card" style="text-align: center">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">Renovação Estágio - ${pedido.id}</h5>
+                                                                <p class="card-text">${pedido.discente.getNome()}</p>
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
+                                               </c:when>
+                                            </c:choose>
                                         </c:when>
                                     </c:choose>
                                     <c:if test="${i.count % 3 == 0}">
@@ -189,6 +228,7 @@
                     </div>
                 </div>
             </div>
+        </div>
             <!-- End of Main Content -->
             <!-- Footer -->
             <footer class="sticky-footer bg-white">

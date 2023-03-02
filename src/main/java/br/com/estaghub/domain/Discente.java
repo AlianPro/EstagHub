@@ -62,4 +62,8 @@ public class Discente {
         DiscenteRepositoryImpl discenteRepository = new DiscenteRepositoryImpl();
         discenteRepository.addInfoNovoPedidoInDiscente(discente);
     }
+    public Discente getDiscenteById(Long id){
+        DiscenteRepositoryImpl discenteRepository = new DiscenteRepositoryImpl();
+        return discenteRepository.getDiscenteById(id);
+    }
 }

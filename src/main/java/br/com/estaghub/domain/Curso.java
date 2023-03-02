@@ -33,4 +33,8 @@ public class Curso {
         CursoRepositoryImpl cursoRepository = new CursoRepositoryImpl();
         return cursoRepository.getAllCursos();
     }
+    public void criarCurso(Curso curso){
+        CursoRepositoryImpl cursoRepository = new CursoRepositoryImpl();
+        cursoRepository.criarCurso(curso);
+    }
 }

@@ -4,10 +4,12 @@ import br.com.estaghub.domain.Discente;
 import br.com.estaghub.domain.Empresa;
 import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.domain.Supervisor;
+import br.com.estaghub.enums.StatusPedido;
 import br.com.estaghub.repository.SupervisorRepository;
 import br.com.estaghub.util.CryptUtil;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class SupervisorRepositoryImpl implements SupervisorRepository {
@@ -83,4 +85,18 @@ public class SupervisorRepositoryImpl implements SupervisorRepository {
         }
         return false;
     }
+//    @Override
+//    public void addFormacaoSupervisor(String idPedido, String formacao) {
+//        if (Objects.nonNull(getPedidoById(Long.parseLong(idPedido)))){
+//            Query query = em.createQuery("UPDATE Pedido set status = :status , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :idPedido");
+//            query.setParameter("status", statusPedido);
+//            query.setParameter("data_hora_ult_atualizacao", LocalDateTime.now());
+//            query.setParameter("idPedido", Long.parseLong(idPedido));
+//            em.getTransaction().begin();
+//            query.executeUpdate();
+//            em.getTransaction().commit();
+//            em.close();
+//            emf.close();
+//        }
+//    }
 }

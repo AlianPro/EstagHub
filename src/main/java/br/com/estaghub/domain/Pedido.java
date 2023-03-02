@@ -36,7 +36,14 @@ public class Pedido {
     private Discente discente;
     @OneToMany(mappedBy = "pedido")
     private List<Documento> documentos;
-    private String justificativa;
+    @Column(name = "justificativa_discente")
+    private String justificativaDiscente;
+    @Column(name = "justificativa_docente")
+    private String justificativaDocente;
+    @Column(name = "justificativa_recurso")
+    private String justificativaRecurso;
+    @Column(name = "justificativa_documentacao")
+    private String justificativaDocumentacao;
     @Enumerated(EnumType.STRING)
     private TipoPedido tipo;
     @Enumerated(EnumType.STRING)
@@ -45,7 +52,16 @@ public class Pedido {
     private LocalDateTime dataHoraCriacao;
     @Column(name = "data_hora_ult_atualizacao")
     private LocalDateTime dataHoraUltimaAtualizacao;
-
+    @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "nomeEmpresa", column = @Column(name = "nome_empresa_renovacao")),
+            @AttributeOverride(name = "enderecoEmpresa", column = @Column(name = "endereco_empresa_renovacao")),
+            @AttributeOverride(name = "resumoAtividades", column = @Column(name = "resumo_atividades_renovacao")),
+            @AttributeOverride(name = "tempoEstagio", column = @Column(name = "tempo_estagio_renovacao")),
+            @AttributeOverride(name = "totalHoras", column = @Column(name = "contribuicao_estagio_renovacao")),
+            @AttributeOverride(name = "avaliacaoSupervisor", column = @Column(name = "avaliacao_supervisor_renovacao"))
+    })
+    private RenovacaoEstagio renovacaoEstagio;
     public void criarPedido(Pedido pedido){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
         pedidoRepository.criarPedido(pedido);
@@ -62,9 +78,9 @@ public class Pedido {
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
         pedidoRepository.addSupervisorNoPedido(supervisor, numPedido);
     }
-    public Optional<Pedido> getPedidoByDiscenteId(Discente discente, TipoPedido tipoPedido){
+    public Optional<Pedido> getPedidoByDiscente(Discente discente, TipoPedido tipoPedido){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
-        return pedidoRepository.getPedidoByDiscenteId(discente, tipoPedido);
+        return pedidoRepository.getPedidoByDiscente(discente, tipoPedido);
     }
     public Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
@@ -73,5 +89,45 @@ public class Pedido {
     public List<Pedido> getAllPedidos(){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
         return pedidoRepository.getAllPedidos();
+    }
+    public void changeStatusPedido(String idPedido, StatusPedido statusPedido){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.changeStatusPedido(idPedido,statusPedido);
+    }
+    public void changeJustificativaDocentePedido(String idPedido, String justificativa){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.changeJustificativaDocentePedido(idPedido,justificativa);
+    }
+    public void changeJustificativaDiscentePedido(String idPedido, String justificativa){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.changeJustificativaDiscentePedido(idPedido,justificativa);
+    }
+    public void changeJustificativaRecursoPedido(String idPedido, String justificativa){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.changeJustificativaRecursoPedido(idPedido,justificativa);
+    }
+    public void addDocenteComissaoInPedido(String idPedido, Docente docente){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.addDocenteComissaoInPedido(idPedido,docente);
+    }
+    public void addDocenteOrientadorInPedido(String idPedido, Docente docente){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.addDocenteOrientadorInPedido(idPedido,docente);
+    }
+    public List<Pedido> getAllPedidosOfDocente(Docente docente){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        return pedidoRepository.getAllPedidosOfDocente(docente);
+    }
+    public List<Pedido> getAllPedidosOfSupervisor(Supervisor supervisor){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        return pedidoRepository.getAllPedidosOfSupervisor(supervisor);
+    }
+    public void changeJustificativaDocumentacaoPedido(String idPedido, String justificativa){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.changeJustificativaDocumentacaoPedido(idPedido,justificativa);
+    }
+    public void addAvaliacaoDesempenhoDiscenteInPedido(String idPedido, String justificativa){
+        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
+        pedidoRepository.addAvaliacaoDesempenhoDiscenteInPedido(idPedido,justificativa);
     }
 }
