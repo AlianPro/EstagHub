@@ -1,6 +1,8 @@
 package br.com.estaghub.util;
 
 import br.com.estaghub.domain.Discente;
+import br.com.estaghub.domain.Docente;
+import br.com.estaghub.domain.Documento;
 import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.enums.TipoDocumento;
 import br.com.estaghub.enums.TipoPedido;
@@ -11,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Collection;
+import java.util.Optional;
 
 public class FileUtil {
     public static String OUTPUT_FILE = "/home/alianpro/Documents/Projetos/estaghub/src/main/java/br/com/estaghub/docs/pedidos";
@@ -60,8 +63,24 @@ public class FileUtil {
         }
     }
 
-    public static String createNomeArquivo(String idDiscente, String tipo, Part part) {
-        return String.format("%s-%s-%s", idDiscente, tipo, part.getSubmittedFileName());
+    public static void armazenarDocumentoAssinadoDocente(Docente docente, Part part) {
+        try{
+            File fileSaveDir = new File(OUTPUT_FILE);
+            if (!fileSaveDir.exists()) {
+                fileSaveDir.mkdirs();
+            }
+            if (part.getName().equals("planoAtividadesAssinado")){
+                part.write(OUTPUT_FILE + File.separator + createNomeArquivo(String.valueOf(docente.getId()), "PLANO_ATIVIDADES_ASSINADO_DOCENTE", part));
+            }else if(part.getName().equals("tceAssinado")){
+                part.write(OUTPUT_FILE + File.separator + createNomeArquivo(String.valueOf(docente.getId()), "TCE_ASSINADO_DOCENTE", part));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
+    public static String createNomeArquivo(String id, String tipo, Part part) {
+        return String.format("%s-%s-%s", id, tipo, part.getSubmittedFileName());
     }
     public static String createNomeArquivoEstagio(String idDiscente, TipoDocumento tipoDocumento) {
         if (tipoDocumento == TipoDocumento.PLANO_ATIVIDADES){
@@ -72,5 +91,31 @@ public class FileUtil {
             return String.format("%s-%s-MODELO-TERMO-ADITIVO-5.doc",idDiscente,tipoDocumento.name());
         }
         return "";
+    }
+
+    public static void criarDocumento(Pedido pedido, Discente discente, TipoPedido tipoPedido, TipoDocumento tipoDocumento, Optional<Part> part) {
+        pedido.getPedidoByDiscente(discente, tipoPedido).ifPresent(pedidoToBeSavedInDocumento ->{
+            Documento documento = new Documento();
+            documento.setPedido(pedidoToBeSavedInDocumento);
+            documento.setTipoDocumento(tipoDocumento);
+            part.ifPresent(value -> documento.setNome(FileUtil.createNomeArquivo(String.valueOf(discente.getId()), tipoDocumento.name(), value)));
+            documento.criarDocumento(documento);
+        });
+    }
+    public static void criarDocumentoDocente(Pedido pedido, Docente docente, TipoDocumento tipoDocumento, Optional<Part> part) {
+        Documento documento = new Documento();
+        documento.setPedido(pedido);
+        documento.setTipoDocumento(tipoDocumento);
+        part.ifPresent(value -> documento.setNome(FileUtil.createNomeArquivo(String.valueOf(docente.getId()), tipoDocumento.name(), value)));
+        documento.criarDocumento(documento);
+    }
+    public static void criarDocumentoEstagio(Pedido pedido, Discente discente, TipoPedido tipoPedido, TipoDocumento tipoDocumento) {
+        pedido.getPedidoByDiscente(discente, tipoPedido).ifPresent(pedidoToBeSavedInDocumento ->{
+            Documento documento = new Documento();
+            documento.setPedido(pedidoToBeSavedInDocumento);
+            documento.setTipoDocumento(tipoDocumento);
+            documento.setNome((FileUtil.createNomeArquivoEstagio(String.valueOf(discente.getId()), tipoDocumento)));
+            documento.criarDocumento(documento);
+        });
     }
 }

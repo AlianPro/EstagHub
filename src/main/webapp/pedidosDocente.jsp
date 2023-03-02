@@ -45,6 +45,8 @@
                         alert("Pedido em andamento!");
                     }else if(${'NOVO_STEP4_ATIVIDADES_TCE' == PEDIDO.status.name()}){
                         alert("Pedido em andamento!");
+                    }else if(${'NOVO_STEP4_DOCENTE_ASSINADO' == PEDIDO.status.name()}){
+                        window.location.replace("assinarDocumentoDocente.jsp");
                     }else if(${'RENOVACAO_STEP3' == PEDIDO.status.name()}){
                         window.location.replace("renovacaoStep3.jsp");
                     }
@@ -192,6 +194,9 @@
                                                                 <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
                                                             </c:when>
                                                             <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == pedido.status.name()}">
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </c:when>
+                                                            <c:when test="${'NOVO_STEP4_DOCENTE_ASSINADO' == pedido.status.name()}">
                                                                 <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
                                                             </c:when>
                                                         </c:choose>

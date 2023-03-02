@@ -80,11 +80,22 @@ public class DiscenteController extends HttpServlet {
                 discenteRenovacaoEstagio(req, resp);
             }else if (req.getParts().stream().anyMatch(partButton -> partButton.getName().equals("submitButtonDiscenteTermoAditivo"))){
                 discenteElaborarTermoAditivo(req, resp);
+            }else if (req.getParts().stream().anyMatch(partButton -> partButton.getName().equals("submitButtonDiscenteFinalizar"))){
+                discenteFinalizarPedido(req, resp);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
 
+    }
+    private void discenteFinalizarPedido(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
+        HttpSession session = req.getSession();
+        Pedido pedido = new Pedido();
+        if (req.getParts().stream().anyMatch(part -> "submitButtonDiscenteFinalizar".equals(part.getName()))){
+            pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.PEDIDO_ENCERRADO);
+            RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
+            view.forward(req, resp);
+        }
     }
     private void discenteElaborarTermoAditivo(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
         HttpSession session = req.getSession();
@@ -112,8 +123,8 @@ public class DiscenteController extends HttpServlet {
         TermoAditivo termoAditivo = termoAditivoMapper.toDiscenteCreateDocumento(termoAditivoCreationDTO);
         if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).isEmpty()){
             documentoService.gerarTermoAditivo(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TERMO_ADITIVO, termoAditivoCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())),pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())));
-            criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.RENOVACAO, TipoDocumento.TERMO_ADITIVO);
             Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getId();
+            FileUtil.criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.RENOVACAO, TipoDocumento.TERMO_ADITIVO);
             documento.addTermoAditivoInDocumento(String.valueOf(idDocumento),termoAditivo);
             S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getNome());
             session.setAttribute("TERMO_ADITIVO_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getNome()));
@@ -135,12 +146,18 @@ public class DiscenteController extends HttpServlet {
             if ("NOVO_STEP3_DISCENTE_ASSINADO".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getStatus().name())){
                 if (req.getParts().stream().anyMatch(part -> "planoAtividadesAssinado".equals(part.getName()))){
                     FileUtil.armazenarDocumentoAssinadoDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), req.getParts().stream().filter(part -> "planoAtividadesAssinado".equals(part.getName())).findFirst().get(),TipoPedido.NOVO);
-                    criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "planoAtividadesAssinado".equals(part.getName())).findFirst());
+                    if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).isPresent()){
+                        documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE);
+                    }
+                    FileUtil.criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "planoAtividadesAssinado".equals(part.getName())).findFirst());
                     S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome());
                 }
                 if (req.getParts().stream().anyMatch(part -> "tceAssinado".equals(part.getName()))){
                     FileUtil.armazenarDocumentoAssinadoDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), req.getParts().stream().filter(part -> "tceAssinado".equals(part.getName())).findFirst().get(),TipoPedido.NOVO);
-                    criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "tceAssinado".equals(part.getName())).findFirst());
+                    if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE).isPresent()){
+                        documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE);
+                    }
+                    FileUtil.criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "tceAssinado".equals(part.getName())).findFirst());
                     S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
                 }
                 pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP4);
@@ -193,7 +210,7 @@ public class DiscenteController extends HttpServlet {
         TCE tce = tceMapper.toDiscenteCreateDocumento(tceCreationDTO);
         if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).isEmpty()){
             documentoService.gerarTCE(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TCE, tceCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())));
-            criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE);
+            FileUtil.criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE);
             Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getId();
             documento.addTCEInDocumento(String.valueOf(idDocumento),tce);
             S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome());
@@ -253,7 +270,7 @@ public class DiscenteController extends HttpServlet {
         PlanoAtividades planoAtividades = planoAtividadesMapper.toDiscenteCreateDocumento(planoAtividadesCreationDTO, atividades);
         if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES).isEmpty()){
             documentoService.gerarPlanoAtividades(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.PLANO_ATIVIDADES, atividades, planoAtividadesCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())),pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())));
-            criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.PLANO_ATIVIDADES);
+            FileUtil.criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.PLANO_ATIVIDADES);
             Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES).get().getId();
             documento.addPlanoAtividadesInDocumento(String.valueOf(idDocumento),planoAtividades);
             S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES).get().getNome());
@@ -283,6 +300,7 @@ public class DiscenteController extends HttpServlet {
             session.setAttribute("PLANO_ATIVIDADES",documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES).get());
             pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP4_TCE);
             session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
+            session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
             RequestDispatcher view = req.getRequestDispatcher(NOVO_STEP3);
             view.forward(req, resp);
         }
@@ -345,9 +363,9 @@ public class DiscenteController extends HttpServlet {
                 discente.addInfoNovoPedidoInDiscente(discente);
                 pedido.setDiscente(discente);
                 pedido.criarPedido(pedido);
-                criarDocumento(pedido, discente, TipoPedido.RENOVACAO, TipoDocumento.HISTORICO_ACADEMICO, req.getParts().stream().filter(part -> "historicoDiscente".equals(part.getName())).findFirst());
+                FileUtil.criarDocumento(pedido, discente, TipoPedido.RENOVACAO, TipoDocumento.HISTORICO_ACADEMICO, req.getParts().stream().filter(part -> "historicoDiscente".equals(part.getName())).findFirst());
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.HISTORICO_ACADEMICO).get().getNome());
-                criarDocumento(pedido, discente, TipoPedido.RENOVACAO, TipoDocumento.GRADE_HORARIO, req.getParts().stream().filter(part -> "gradeHorarioDiscente".equals(part.getName())).findFirst());
+                FileUtil.criarDocumento(pedido, discente, TipoPedido.RENOVACAO, TipoDocumento.GRADE_HORARIO, req.getParts().stream().filter(part -> "gradeHorarioDiscente".equals(part.getName())).findFirst());
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.GRADE_HORARIO).get().getNome());
                 session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
                 RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
@@ -399,9 +417,9 @@ public class DiscenteController extends HttpServlet {
                 discente.addInfoNovoPedidoInDiscente(discente);
                 pedido.setDiscente(discente);
                 pedido.criarPedido(pedido);
-                criarDocumento(pedido, discente, TipoPedido.NOVO, TipoDocumento.HISTORICO_ACADEMICO, req.getParts().stream().filter(part -> "historicoDiscente".equals(part.getName())).findFirst());
+                FileUtil.criarDocumento(pedido, discente, TipoPedido.NOVO, TipoDocumento.HISTORICO_ACADEMICO, req.getParts().stream().filter(part -> "historicoDiscente".equals(part.getName())).findFirst());
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.HISTORICO_ACADEMICO).get().getNome());
-                criarDocumento(pedido, discente, TipoPedido.NOVO, TipoDocumento.GRADE_HORARIO, req.getParts().stream().filter(part -> "gradeHorarioDiscente".equals(part.getName())).findFirst());
+                FileUtil.criarDocumento(pedido, discente, TipoPedido.NOVO, TipoDocumento.GRADE_HORARIO, req.getParts().stream().filter(part -> "gradeHorarioDiscente".equals(part.getName())).findFirst());
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.GRADE_HORARIO).get().getNome());
                 session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
                 RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
@@ -410,25 +428,6 @@ public class DiscenteController extends HttpServlet {
         }catch (Exception e){
             e.printStackTrace();
         }
-    }
-
-    private static void criarDocumento(Pedido pedido, Discente discente, TipoPedido tipoPedido, TipoDocumento tipoDocumento, Optional<Part> part) {
-        pedido.getPedidoByDiscente(discente, tipoPedido).ifPresent(pedidoToBeSavedInDocumento ->{
-            Documento documento = new Documento();
-            documento.setPedido(pedidoToBeSavedInDocumento);
-            documento.setTipoDocumento(tipoDocumento);
-            part.ifPresent(value -> documento.setNome(FileUtil.createNomeArquivo(String.valueOf(discente.getId()), tipoDocumento.name(), value)));
-            documento.criarDocumento(documento);
-        });
-    }
-    private static void criarDocumentoEstagio(Pedido pedido, Discente discente, TipoPedido tipoPedido, TipoDocumento tipoDocumento) {
-        pedido.getPedidoByDiscente(discente, tipoPedido).ifPresent(pedidoToBeSavedInDocumento ->{
-            Documento documento = new Documento();
-            documento.setPedido(pedidoToBeSavedInDocumento);
-            documento.setTipoDocumento(tipoDocumento);
-            documento.setNome((FileUtil.createNomeArquivoEstagio(String.valueOf(discente.getId()), tipoDocumento)));
-            documento.criarDocumento(documento);
-        });
     }
 
     private String getContextParameter(String name) {

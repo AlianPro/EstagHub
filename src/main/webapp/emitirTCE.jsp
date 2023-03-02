@@ -271,7 +271,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="nomeEmpresaTCE">Nome da Empresa</label>
-                                            <input class="form-control" id="nomeEmpresaTCE" type="text" name="nomeEmpresa" required placeholder="Nome da Empresa" value="${DOCUMENTO_TCE.tce.getNomeEmpresa()}"/>
+                                            <input class="form-control" id="nomeEmpresaTCE" type="text" name="nomeEmpresa" required placeholder="Nome da Empresa" value="${DOCUMENTO.tce.getNomeEmpresa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -281,7 +281,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="cnpjEmpresaTCE">CNPJ da Empresa</label>
-                                            <input class="form-control" id="cnpjEmpresaTCE" type="text" name="cnpjEmpresa" required placeholder="CNPJ da Empresa" value="${DOCUMENTO_TCE.tce.getCnpjEmpresa()}"/>
+                                            <input class="form-control" id="cnpjEmpresaTCE" type="text" name="cnpjEmpresa" required placeholder="CNPJ da Empresa" value="${DOCUMENTO.tce.getCnpjEmpresa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -291,7 +291,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="horarioInicioTCE">Horário Início</label>
-                                            <input class="form-control" id="horarioInicioTCE" type="time" name="horarioInicio" required value="${DOCUMENTO_TCE.tce.getHorarioInicio()}"/>
+                                            <input class="form-control" id="horarioInicioTCE" type="time" name="horarioInicio" required value="${DOCUMENTO.tce.getHorarioInicio()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -301,7 +301,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="horarioFimTCE">Horário Fim</label>
-                                            <input class="form-control" id="horarioFimTCE" type="time" name="horarioFim" required value="${DOCUMENTO_TCE.tce.getHorarioFim()}"/>
+                                            <input class="form-control" id="horarioFimTCE" type="time" name="horarioFim" required value="${DOCUMENTO.tce.getHorarioFim()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -311,7 +311,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="intervaloEstagioTCE">Intervalo</label>
-                                            <input class="form-control" id="intervaloEstagioTCE" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas" value="${DOCUMENTO_TCE.tce.getTotalHoras()}"/>
+                                            <input class="form-control" id="intervaloEstagioTCE" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas" value="${DOCUMENTO.tce.getTotalHoras()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -321,7 +321,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="totalHorasTCE">Total Horas</label>
-                                            <input class="form-control" id="totalHorasTCE" type="text" name="totalHoras" required placeholder="Total Horas Semanais" value="${DOCUMENTO_TCE.tce.getIntervalo()}"/>
+                                            <input class="form-control" id="totalHorasTCE" type="text" name="totalHoras" required placeholder="Total Horas Semanais" value="${DOCUMENTO.tce.getIntervalo()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -331,7 +331,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="dataInicioTCE">Data Início</label>
-                                            <input class="form-control" id="dataInicioTCE" type="date" name="dataInicio" required value="${DOCUMENTO_TCE.tce.getDataInicio()}"/>
+                                            <input class="form-control" id="dataInicioTCE" type="date" name="dataInicio" required value="${DOCUMENTO.tce.getDataInicio()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -341,7 +341,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="dataFimTCE">Data Fim</label>
-                                            <input class="form-control" id="dataFimTCE" type="date" name="dataFim" required value="${DOCUMENTO_TCE.tce.getDataFim()}"/>
+                                            <input class="form-control" id="dataFimTCE" type="date" name="dataFim" required value="${DOCUMENTO.tce.getDataFim()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -351,7 +351,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="bolsaEstagioTCE">Bolsa</label>
-                                            <input class="form-control" id="bolsaEstagioTCE" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso" value="${DOCUMENTO_TCE.tce.getBolsa()}"/>
+                                            <input class="form-control" id="bolsaEstagioTCE" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso" value="${DOCUMENTO.tce.getBolsa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -361,7 +361,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="auxilioTransporteTCE">Auxílio Transporte</label>
-                                            <input class="form-control" id="auxilioTransporteTCE" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso" value="${DOCUMENTO_TCE.tce.getAuxTransporte()}"/>
+                                            <input class="form-control" id="auxilioTransporteTCE" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso" value="${DOCUMENTO.tce.getAuxTransporte()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -371,7 +371,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="codigoApoliceTCE">Código Apólice</label>
-                                            <input class="form-control" id="codigoApoliceTCE" type="text" name="codigoApolice" required placeholder="Código Apólice do Seguro" value="${DOCUMENTO_TCE.tce.getCodApolice()}"/>
+                                            <input class="form-control" id="codigoApoliceTCE" type="text" name="codigoApolice" required placeholder="Código Apólice do Seguro" value="${DOCUMENTO.tce.getCodApolice()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -381,7 +381,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="nomeSeguradoraTCE">Nome Seguradora</label>
-                                            <input class="form-control" id="nomeSeguradoraTCE" type="text" name="nomeSeguradora" required placeholder="Nome da Seguradora" value="${DOCUMENTO_TCE.tce.getNomeSeguradora()}"/>
+                                            <input class="form-control" id="nomeSeguradoraTCE" type="text" name="nomeSeguradora" required placeholder="Nome da Seguradora" value="${DOCUMENTO.tce.getNomeSeguradora()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>

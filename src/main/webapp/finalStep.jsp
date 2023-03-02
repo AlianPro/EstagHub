@@ -13,19 +13,66 @@
     <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
-
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.css" rel="stylesheet">
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
     <script>
-        function logoutDiscente(){
+        $(document).ready(function (){
+            let formLogin = document.getElementById('discenteForm');
+            if(formLogin) {
+                const forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach((formLogin) => {
+                    formLogin.addEventListener('submit', (event) => {
+                        if (!formLogin.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }else{
+                        }
+                        formLogin.classList.add('was-validated');
+                    }, false);
+                });
+            }
+        });
+        function showTextArea(){
+            $("#textAreaDiv").children().prop('disabled',false);
+            $("#textAreaDiv").prop('hidden',false);
+            $("#selectDocente").children().prop('disabled',true);
+            $("#selectDocente").prop('hidden',true);
+        }
+        function hideTextArea(){
+            $("#textAreaDiv").children().prop('disabled',true);
+            $("#textAreaDiv").prop('hidden',true);
+            $("#selectDocente").children().prop('disabled',false);
+            $("#selectDocente").prop('hidden',false);
+        }
+        function sendNextPage(idPedido, statusPedido){
             $.ajax({
                 type: "POST",
                 url: "discenteController",
                 data: {
-                    buttonLogoutDiscente: 'logout'
+                    buttonPedido: 'pedido',
+                    idPedido: idPedido,
+                    statusPedido: statusPedido
                 },
-                sucess: function (){
+                success: function (){
                     return true;
+                }
+            });
+        }
+        function download(){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                data: {
+                    buttonBaixar: 'baixar'
                 }
             });
         }
@@ -59,13 +106,13 @@
             Ações
         </div>
 
-        <!-- Nav Item - Novo estágio Collapse Menu -->
+        <!-- Nav Item - Pedidos Collapse Menu -->
         <li class="nav-item">
             <c:choose>
                 <c:when test="${RENOVACAO_ESTAGIO == null}">
                     <c:choose>
                         <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name()}">
-        <%--                    TODO tela para avisar q está esperando resposta do docente--%>
+                            <%--                    TODO tela para avisar q está esperando resposta do docente--%>
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
                                 <i class="fas fa-fw fa-cog"></i>
                                 <span>Novo Estágio</span>
@@ -93,12 +140,6 @@
                         </c:when>
                         <c:when test="${'NOVO_STEP3' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
                                 <i class="fas fa-fw fa-cog"></i>
                                 <span>Novo Estágio</span>
                             </a>
@@ -133,12 +174,6 @@
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
-                        <c:when test="${'PEDIDO_ENCERRADO' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-cog"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
                         <c:otherwise>
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="novoEstagio.jsp">
                                 <i class="fas fa-fw fa-cog"></i>
@@ -149,8 +184,6 @@
                 </c:when>
             </c:choose>
         </li>
-
-        <!-- Nav Item - Renovação de estágio Collapse Menu -->
         <c:choose>
             <c:when test="${NOVO_ESTAGIO == null}">
                 <c:choose>
@@ -265,14 +298,42 @@
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>
+                <h1 class="h3 mb-4 text-gray-800">Assinar Documentos</h1>
 
             </div>
             <!-- /.container-fluid -->
-
+            <div class="modal-body border-0 p-4">
+                <div class="sw sw-theme-basic sw-justified">
+                    <div class="tab-content">
+                        <div class="tab-pane" style="display: block">
+                            <c:if test="${'NOVO' == NOVO_ESTAGIO.tipo.name()}">
+                                <div class="form-floating mb-3">
+                                    <label for="planoAtividadesAntigo">Download do Plano de Atividades Assinado:</label>
+                                    <a id="planoAtividadesAntigo" href="${PLANO_ATIVIDADES_URL}">${PLANO_ATIVIDADES.nome}</a>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <label for="tceAntigo">Download do TCE Assinado:</label>
+                                    <a id="tceAntigo" href="${TCE_URL}">${TCE.nome}</a>
+                                </div>
+                            </c:if>
+                            <c:if test="${'RENOVACAO' == RENOVACAO_ESTAGIO.tipo.name()}">
+                                <div class="form-floating mb-3">
+                                    <label for="termoAditivoAntigo">Download do Termo Aditivo Assinado:</label>
+                                    <a id="termoAditivoAntigo" href="${TERMO_ADITIVO_URL}">${TERMO_ADITIVO.nome}</a>
+                                </div>
+                            </c:if>
+                            <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
+                                <div role="toolbar" style="text-align: right">
+                                    <button class="btn btn-primary" type="submit" id="submitButtonDiscenteFinalizar" name="submitButtonDiscenteFinalizar" value="novoFinalizar">Finalizar Pedido</button>
+                                    <a href="https://institucional.ufrrj.br/dest/formularios-tce/" target="_blank" class="btn btn-primary">Ir para DEST</a>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- End of Main Content -->
-
         <!-- Footer -->
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
@@ -282,7 +343,6 @@
             </div>
         </footer>
         <!-- End of Footer -->
-
     </div>
     <!-- End of Content Wrapper -->
 
@@ -308,21 +368,11 @@
             <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                <a href="index.jsp" id="buttonLogoutDiscente" name="buttonLogoutDiscente" type="submit" class="btn btn-primary" onclick="logoutDiscente()">Logout</a>
+                <button id="buttonLogoutDocenteComissao" name="buttonLogoutDocenteComissao" type="submit" value="logout" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Bootstrap core JavaScript-->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Core plugin JavaScript-->
-<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-<!-- Custom scripts for all pages-->
-<script src="js/sb-admin-2.min.js"></script>
 
 </body>
 

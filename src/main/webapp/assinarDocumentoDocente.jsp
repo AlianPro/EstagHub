@@ -13,19 +13,66 @@
     <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
-
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.css" rel="stylesheet">
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="js/sb-admin-2.min.js"></script>
     <script>
-        function logoutDocenteComissao(){
+        $(document).ready(function (){
+            let formLogin = document.getElementById('docenteForm');
+            if(formLogin) {
+                const forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach((formLogin) => {
+                    formLogin.addEventListener('submit', (event) => {
+                        if (!formLogin.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }else{
+                        }
+                        formLogin.classList.add('was-validated');
+                    }, false);
+                });
+            }
+        });
+        function showTextArea(){
+            $("#textAreaDiv").children().prop('disabled',false);
+            $("#textAreaDiv").prop('hidden',false);
+            $("#selectDocente").children().prop('disabled',true);
+            $("#selectDocente").prop('hidden',true);
+        }
+        function hideTextArea(){
+            $("#textAreaDiv").children().prop('disabled',true);
+            $("#textAreaDiv").prop('hidden',true);
+            $("#selectDocente").children().prop('disabled',false);
+            $("#selectDocente").prop('hidden',false);
+        }
+        function sendNextPage(idPedido, statusPedido){
             $.ajax({
                 type: "POST",
                 url: "docenteController",
                 data: {
-                    buttonLogoutDocenteComissao: 'logout'
+                    buttonPedido: 'pedido',
+                    idPedido: idPedido,
+                    statusPedido: statusPedido
                 },
-                sucess: function (){
+                success: function (){
                     return true;
+                }
+            });
+        }
+        function download(){
+            $.ajax({
+                type: "POST",
+                url: "docenteController",
+                data: {
+                    buttonBaixar: 'baixar'
                 }
             });
         }
@@ -66,7 +113,6 @@
                 <span>Pedidos</span>
             </a>
         </li>
-
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
 
@@ -127,14 +173,55 @@
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>
+                <h1 class="h3 mb-4 text-gray-800">Assinar Documentos</h1>
 
             </div>
             <!-- /.container-fluid -->
-
+            <div class="modal-body border-0 p-4">
+                <div class="sw sw-theme-basic sw-justified">
+                    <div class="tab-content">
+                        <div class="tab-pane" style="display: block">
+                            <c:if test="${'NOVO' == NOVO_ESTAGIO.tipo.name()}">
+                                <div class="form-floating mb-3">
+                                    <label for="planoAtividadesAntigo">Download do Plano de Atividades:</label>
+                                    <a id="planoAtividadesAntigo" href="${PLANO_ATIVIDADES_URL}">${PLANO_ATIVIDADES.nome}</a>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <label for="tceAntigo">Download do TCE:</label>
+                                    <a id="tceAntigo" href="${TCE_URL}">${TCE.nome}</a>
+                                </div>
+                            </c:if>
+                            <form class="needs-validation" enctype="multipart/form-data" novalidate id="docenteForm" name="docenteForm" action="docenteController" method="post">
+                                <div class="form-floating mb-3">
+                                    <label for="planoAtividadesAssinado">Anexe o Plano de Atividades Assinado:</label>
+                                    <input id="planoAtividadesAssinado" name="planoAtividadesAssinado" required type="file" accept=".doc"/>
+                                    <div class="valid-feedback">
+                                        Perfeito!
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Ops! Anexe o Plano de Atividades assinado.
+                                    </div>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <label for="tceAssinado">Anexe o TCE assinado:</label>
+                                    <input id="tceAssinado" name="tceAssinado" required type="file" accept=".doc"/>
+                                    <div class="valid-feedback">
+                                        Perfeito!
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Ops! Anexe o TCE assinado.
+                                    </div>
+                                </div>
+                                <div role="toolbar" style="text-align: right">
+                                    <button class="btn btn-primary" type="submit" id="submitButtonDocenteAssinar" name="submitButtonDocenteAssinar" value="step4Assinar">Enviar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!-- End of Main Content -->
-
         <!-- Footer -->
         <footer class="sticky-footer bg-white">
             <div class="container my-auto">
@@ -144,7 +231,6 @@
             </div>
         </footer>
         <!-- End of Footer -->
-
     </div>
     <!-- End of Content Wrapper -->
 
@@ -170,21 +256,11 @@
             <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                <a href="index.jsp" id="buttonLogoutDiscente" name="buttonLogoutDiscente" type="submit" class="btn btn-primary" onclick="logoutDiscente()">Logout</a>
+                <button id="buttonLogoutDocenteComissao" name="buttonLogoutDocenteComissao" type="submit" value="logout" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</button>
             </div>
         </div>
     </div>
 </div>
-
-<!-- Bootstrap core JavaScript-->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Core plugin JavaScript-->
-<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-<!-- Custom scripts for all pages-->
-<script src="js/sb-admin-2.min.js"></script>
 
 </body>
 

@@ -6,16 +6,21 @@ import br.com.estaghub.dto.DepartamentoCreationDTO;
 import br.com.estaghub.dto.DocenteCreationDTO;
 import br.com.estaghub.enums.StatusPedido;
 import br.com.estaghub.enums.TipoDocumento;
+import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.mapper.impl.CursoMapperImpl;
 import br.com.estaghub.mapper.impl.DepartamentoMapperImpl;
 import br.com.estaghub.mapper.impl.DocenteMapperImpl;
+import br.com.estaghub.util.FileUtil;
 import br.com.estaghub.util.S3Util;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
 @WebServlet(name = "DocenteController", value = "/docenteController")
@@ -38,6 +43,7 @@ public class DocenteController extends HttpServlet {
     private static final String RENOVACAO_STEP2 = "/renovacaoStep2.jsp";
     private static final String RENOVACAO_STEP3 = "/renovacaoStep3.jsp";
     private static final String RENOVACAO_STEP4 = "/renovacaoStep4.jsp";
+    private static final String NOVO_STEP4_ASSINAR = "/assinarDocumentoDocente.jsp";
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -84,6 +90,16 @@ public class DocenteController extends HttpServlet {
                     session.setAttribute("TCE_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome()));
                     session.setAttribute("PLANO_ATIVIDADES", documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get());
                     session.setAttribute("TCE", documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.TCE_ASSINADO_DISCENTE).get());
+                    RequestDispatcher view = req.getRequestDispatcher(NOVO_STEP4);
+                    view.forward(req,resp);
+                }else if (StatusPedido.NOVO_STEP4_DOCENTE_ASSINADO.name().equals(statusPedido)){
+                    session.setAttribute("PLANO_ATIVIDADES_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome()));
+                    session.setAttribute("TCE_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome()));
+                    session.setAttribute("PLANO_ATIVIDADES", documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get());
+                    session.setAttribute("TCE", documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.TCE_ASSINADO_DISCENTE).get());
+                    session.setAttribute("NOVO_ESTAGIO", pedido.getPedidoById(Long.parseLong(idPedido)));
+                    RequestDispatcher view = req.getRequestDispatcher(NOVO_STEP4_ASSINAR);
+                    view.forward(req,resp);
                 }else if (StatusPedido.RENOVACAO_STEP2.name().equals(statusPedido)){
                     session.setAttribute("HISTORICO_ACADEMICO_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.HISTORICO_ACADEMICO).get().getNome()));
                     session.setAttribute("GRADE_HORARIO_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido), TipoDocumento.GRADE_HORARIO).get().getNome()));
@@ -218,10 +234,44 @@ public class DocenteController extends HttpServlet {
                     RequestDispatcher view = req.getRequestDispatcher(SUCESS_DOCENTE);
                     view.forward(req,resp);
                 }else if("aceito".equals(decisao)){
-                    pedido.changeStatusPedido(idPedido.toString(),StatusPedido.NOVO_PEDIDO_FIM);
+                    pedido.changeStatusPedido(idPedido.toString(),StatusPedido.NOVO_STEP4_DOCENTE_ASSINADO);
                     session.setAttribute("LIST_PEDIDOS",pedido.getAllPedidosOfDocente(docente.getDocenteByEmail(emailDocente.toString()).get()));
-                    RequestDispatcher view = req.getRequestDispatcher(SUCESS_DOCENTE);
+                    session.setAttribute("PLANO_ATIVIDADES_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome()));
+                    session.setAttribute("TCE_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome()));
+                    session.setAttribute("PLANO_ATIVIDADES", documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get());
+                    session.setAttribute("TCE", documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get());
+                    session.setAttribute("NOVO_ESTAGIO", pedido.getPedidoById(Long.parseLong(idPedido.toString())));
+                    RequestDispatcher view = req.getRequestDispatcher(NOVO_STEP4_ASSINAR);
                     view.forward(req,resp);
+                }
+            }else if (req.getParts().stream().anyMatch(partButton -> partButton.getName().equals("submitButtonDocenteAssinar"))) {
+                HttpSession session = req.getSession();
+                Pedido pedido = new Pedido();
+                Docente docente = new Docente();
+                Documento documento = new Documento();
+                if ("NOVO".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getTipo().name())){
+                    if ("NOVO_STEP4_DOCENTE_ASSINADO".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getStatus().name())){
+                        if (req.getParts().stream().anyMatch(part -> "planoAtividadesAssinado".equals(part.getName()))){
+                            FileUtil.armazenarDocumentoAssinadoDocente(docente.getDocenteByEmail(session.getAttribute("EMAIL_DOCENTE").toString()).get(), req.getParts().stream().filter(part -> "planoAtividadesAssinado".equals(part.getName())).findFirst().get());
+                            if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DOCENTE).isPresent()){
+                                documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DOCENTE);
+                            }
+                            FileUtil.criarDocumentoDocente(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), docente.getDocenteByEmail(session.getAttribute("EMAIL_DOCENTE").toString()).get(), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DOCENTE, req.getParts().stream().filter(part -> "planoAtividadesAssinado".equals(part.getName())).findFirst());
+                            S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DOCENTE).get().getNome());
+                        }
+                        if (req.getParts().stream().anyMatch(part -> "tceAssinado".equals(part.getName()))){
+                            FileUtil.armazenarDocumentoAssinadoDocente(docente.getDocenteByEmail(session.getAttribute("EMAIL_DOCENTE").toString()).get(), req.getParts().stream().filter(part -> "tceAssinado".equals(part.getName())).findFirst().get());
+                            if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DOCENTE).isPresent()){
+                                documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DOCENTE);
+                            }
+                            FileUtil.criarDocumentoDocente(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), docente.getDocenteByEmail(session.getAttribute("EMAIL_DOCENTE").toString()).get(), TipoDocumento.TCE_ASSINADO_DOCENTE, req.getParts().stream().filter(part -> "tceAssinado".equals(part.getName())).findFirst());
+                            S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DOCENTE).get().getNome());
+                        }
+                        pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_PEDIDO_FIM);
+                        session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())));
+                        RequestDispatcher view = req.getRequestDispatcher(SUCESS_DOCENTE);
+                        view.forward(req, resp);
+                    }
                 }
             }else if ("novoDocente".equals(req.getParameter("submitButtonDocenteCadastroNovoDocente"))) {
                 Docente docente = new Docente();

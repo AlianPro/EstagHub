@@ -91,4 +91,8 @@ public class Documento {
         DocumentoRepositoryImpl documentoRepository = new DocumentoRepositoryImpl();
         documentoRepository.addTermoAditivoInDocumento(idDocumento, termoAditivo);
     }
+    public void removeDocumento(Long idPedido, TipoDocumento tipoDocumento){
+        DocumentoRepositoryImpl documentoRepository = new DocumentoRepositoryImpl();
+        documentoRepository.removeDocumento(idPedido, tipoDocumento);
+    }
 }

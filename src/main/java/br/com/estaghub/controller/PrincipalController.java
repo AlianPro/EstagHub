@@ -19,7 +19,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Objects;
 
 @WebServlet(name = "PrincipalController", value = "/principalController")
 public class PrincipalController extends HttpServlet {
@@ -51,14 +50,15 @@ public class PrincipalController extends HttpServlet {
                         if (!discente.getDiscenteByEmail(email).isEmpty()){
                             session.setAttribute("DISCENTE",discente.getDiscenteByEmail(email).get());
                             session.setAttribute("ID_DISCENTE",discente.getDiscenteByEmail(email).get().getId());
-                            session.setAttribute("LIST_CURSOS",curso.getAllCursos());
                             if (!pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).isEmpty()){
                                 session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get());
                                 session.setAttribute("ID_PEDIDO",pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId());
                                 if ("NOVO_STEP4_PLANO_ATIVIDADES".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name()) || "NOVO_STEP4_ATIVIDADES_TCE".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())){
-                                    session.setAttribute("DOCUMENTO_PLANO_ATIVIDADES",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).get());
+                                    session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).get());
                                 }else if ("NOVO_STEP4_TCE".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())) {
-                                    session.setAttribute("DOCUMENTO_TCE",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
+                                    session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
+                                }else if ("NOVO_STEP4_ATIVIDADES_TCE".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())) {
+                                    session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
                                 }else if("NOVO_STEP3_DISCENTE_ASSINADO".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())){
                                     if (S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome()).isBlank()){
                                         session.setAttribute("PLANO_ATIVIDADES", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).get());
@@ -75,6 +75,12 @@ public class PrincipalController extends HttpServlet {
                                         session.setAttribute("TCE_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome()));
                                     }
                                 }
+                                else if ("NOVO_PEDIDO_FIM".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())) {
+                                    session.setAttribute("PLANO_ATIVIDADES", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DOCENTE).get());
+                                    session.setAttribute("PLANO_ATIVIDADES_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DOCENTE).get().getNome()));
+                                    session.setAttribute("TCE", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.TCE_ASSINADO_DOCENTE).get());
+                                    session.setAttribute("TCE_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.TCE_ASSINADO_DOCENTE).get().getNome()));
+                                }
                             }else if (!pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).isEmpty()) {
                                 session.setAttribute("RENOVACAO_ESTAGIO", pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get());
                                 session.setAttribute("ID_PEDIDO",pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId());
@@ -82,6 +88,7 @@ public class PrincipalController extends HttpServlet {
                                     session.setAttribute("DOCUMENTO_TERMO_ADITIVO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO).get());
                                 }
                             }
+                            session.setAttribute("LIST_CURSOS",curso.getAllCursos());
                         }
                         view.forward(req,resp);
                     }else{

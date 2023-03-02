@@ -5,17 +5,15 @@ import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.repository.DiscenteRepository;
 import br.com.estaghub.util.CryptUtil;
+import br.com.estaghub.util.HibernateUtil;
 
-import javax.persistence.*;
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
 import java.util.Optional;
 
 public class DiscenteRepositoryImpl implements DiscenteRepository {
-    EntityManagerFactory emf;
-    EntityManager em;
-    public DiscenteRepositoryImpl() {
-        this.emf = Persistence.createEntityManagerFactory("estaghub");
-        this.em = this.emf.createEntityManager();
-    }
+    EntityManager em = HibernateUtil.emf.createEntityManager();
 
     @Override
     public void criarDiscente(Discente discente) {
@@ -28,38 +26,50 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
             em.getTransaction().commit();
         }
         em.close();
-        emf.close();
     }
     @Override
     public Discente getDiscenteById(Long id) {
-        Discente discente = em.find(Discente.class,id);
-//        em.close();
-//        emf.close();
-        return discente;
+        try {
+            return em.find(Discente.class,id);
+        }finally {
+            em.close();
+        }
     }
 
     @Override
     public Boolean loginDiscente(String email, String senha) {
-        TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
-        query.setParameter("email", email);
-        if (!query.getResultList().isEmpty()){
-            return CryptUtil.checkPassword(senha, query.getSingleResult().getSenha());
+        try {
+            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
+            query.setParameter("email", email);
+            if (!query.getResultList().isEmpty()){
+                return CryptUtil.checkPassword(senha, query.getSingleResult().getSenha());
+            }
+            return false;
+        }finally {
+            em.close();
         }
-        return false;
     }
 
     @Override
     public Optional<Discente> getDiscenteByEmail(String email) {
-        TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
-        query.setParameter("email", email);
-        return Optional.ofNullable(query.getSingleResult());
+        try {
+            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
+            query.setParameter("email", email);
+            return Optional.ofNullable(query.getSingleResult());
+        }finally {
+            em.close();
+        }
     }
     @Override
     public Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido) {
-        TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.id_discente = :id and p.tipo = :tipo", Pedido.class);
-        query.setParameter("id", discente.getId());
-        query.setParameter("tipo", tipoPedido);
-        return query.getResultList().size() > 0;
+        try {
+            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.id_discente = :id and p.tipo = :tipo", Pedido.class);
+            query.setParameter("id", discente.getId());
+            query.setParameter("tipo", tipoPedido);
+            return query.getResultList().size() > 0;
+        }finally {
+            em.close();
+        }
     }
     @Override
     public void addInfoNovoPedidoInDiscente(Discente discente) {
@@ -77,6 +87,5 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
         query.executeUpdate();
         em.getTransaction().commit();
         em.close();
-        emf.close();
     }
 }

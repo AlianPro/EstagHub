@@ -270,7 +270,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="nomeEmpresaPlanoAtividades">Nome da Empresa</label>
-                                            <input class="form-control" id="nomeEmpresaPlanoAtividades" type="text" name="nomeEmpresa" required placeholder="Nome Completo da Empresa" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getNomeEmpresa()}"/>
+                                            <input class="form-control" id="nomeEmpresaPlanoAtividades" type="text" name="nomeEmpresa" required placeholder="Nome Completo da Empresa" value="${DOCUMENTO.planoAtividades.getNomeEmpresa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -280,7 +280,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="nomeResponsavelEmpresaPlanoAtividades">Nome do Responsável da Empresa pela Assinatura do TCE</label>
-                                            <input class="form-control" id="nomeResponsavelEmpresaPlanoAtividades" type="text" name="nomeResponsavelEmpresa" required placeholder="Nome Completo do Responsável da Empresa pela Assinatura do TCE" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getResponsavelEmpresa()}"/>
+                                            <input class="form-control" id="nomeResponsavelEmpresaPlanoAtividades" type="text" name="nomeResponsavelEmpresa" required placeholder="Nome Completo do Responsável da Empresa pela Assinatura do TCE" value="${DOCUMENTO.planoAtividades.getResponsavelEmpresa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -290,7 +290,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="enderecoEmpresaPlanoAtividades">Endereço da Empresa</label>
-                                            <input class="form-control" id="enderecoEmpresaPlanoAtividades" type="text" name="enderecoEmpresa" required placeholder="Endereço da Empresa" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getEnderecoEmpresa()}"/>
+                                            <input class="form-control" id="enderecoEmpresaPlanoAtividades" type="text" name="enderecoEmpresa" required placeholder="Endereço da Empresa" value="${DOCUMENTO.planoAtividades.getEnderecoEmpresa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -300,7 +300,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="telefoneEmpresaPlanoAtividades">Telefone da Empresa</label>
-                                            <input class="form-control" id="telefoneEmpresaPlanoAtividades" type="text" name="telefoneEmpresa" required placeholder="(00) 00000-0000" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getTelefoneEmpresa()}"/>
+                                            <input class="form-control" id="telefoneEmpresaPlanoAtividades" type="text" name="telefoneEmpresa" required placeholder="(00) 00000-0000" value="${DOCUMENTO.planoAtividades.getTelefoneEmpresa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -310,7 +310,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="emailEmpresaPlanoAtividades">Email da Empresa</label>
-                                            <input class="form-control" id="emailEmpresaPlanoAtividades" type="text" name="emailEmpresa" required placeholder="name@example.com" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getEmailEmpresa()}"/>
+                                            <input class="form-control" id="emailEmpresaPlanoAtividades" type="text" name="emailEmpresa" required placeholder="name@example.com" value="${DOCUMENTO.planoAtividades.getEmailEmpresa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -320,7 +320,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="nomeSupervisorPlanoAtividades">Nome do Supervisor</label>
-                                            <input class="form-control" id="nomeSupervisorPlanoAtividades" type="text" name="nomeSupervisor" required placeholder="Nome Completo do Supervisor" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getNomeSupervisor()}"/>
+                                            <input class="form-control" id="nomeSupervisorPlanoAtividades" type="text" name="nomeSupervisor" required placeholder="Nome Completo do Supervisor" value="${DOCUMENTO.planoAtividades.getNomeSupervisor()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -330,7 +330,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="formacaoSupervisorPlanoAtividades">Formação Profissional do Supervisor</label>
-                                            <input class="form-control" id="formacaoSupervisorPlanoAtividades" type="text" name="formacaoSupervisor" required placeholder="Formação Profissional do Supervisor" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getFormacaoSupervisor()}"/>
+                                            <input class="form-control" id="formacaoSupervisorPlanoAtividades" type="text" name="formacaoSupervisor" required placeholder="Formação Profissional do Supervisor" value="${DOCUMENTO.planoAtividades.getFormacaoSupervisor()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -340,7 +340,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="primeiraAtividadePlanoAtividades">Primeira Atividade</label>
-                                            <input class="form-control" id="primeiraAtividadePlanoAtividades" type="text" name="primeiraAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getPrimeiraAtividade()}"/>
+                                            <input class="form-control" id="primeiraAtividadePlanoAtividades" type="text" name="primeiraAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO.planoAtividades.getPrimeiraAtividade()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -350,7 +350,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="segundaAtividadePlanoAtividades">Segunda Atividade</label>
-                                            <input class="form-control" id="segundaAtividadePlanoAtividades" type="text" name="segundaAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getSegundaAtividade()}"/>
+                                            <input class="form-control" id="segundaAtividadePlanoAtividades" type="text" name="segundaAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO.planoAtividades.getSegundaAtividade()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -360,7 +360,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="terceiraAtividadePlanoAtividades">Terceira Atividade</label>
-                                            <input class="form-control" id="terceiraAtividadePlanoAtividades" type="text" name="terceiraAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getTerceiraAtividade()}"/>
+                                            <input class="form-control" id="terceiraAtividadePlanoAtividades" type="text" name="terceiraAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO.planoAtividades.getTerceiraAtividade()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -370,7 +370,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="quartaAtividadePlanoAtividades">Quarta Atividade</label>
-                                            <input class="form-control" id="quartaAtividadePlanoAtividades" type="text" name="quartaAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getQuartaAtividade()}"/>
+                                            <input class="form-control" id="quartaAtividadePlanoAtividades" type="text" name="quartaAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO.planoAtividades.getQuartaAtividade()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -380,7 +380,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="quintaAtividadePlanoAtividades">Quinta Atividade</label>
-                                            <input class="form-control" id="quintaAtividadePlanoAtividades" type="text" name="quintaAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO_PLANO_ATIVIDADES.planoAtividades.getQuintaAtividade()}"/>
+                                            <input class="form-control" id="quintaAtividadePlanoAtividades" type="text" name="quintaAtividade" required placeholder="Descrição da Atividade" value="${DOCUMENTO.planoAtividades.getQuintaAtividade()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>

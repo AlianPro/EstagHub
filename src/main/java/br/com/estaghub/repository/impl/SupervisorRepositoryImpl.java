@@ -1,32 +1,27 @@
 package br.com.estaghub.repository.impl;
 
-import br.com.estaghub.domain.Discente;
 import br.com.estaghub.domain.Empresa;
 import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.domain.Supervisor;
-import br.com.estaghub.enums.StatusPedido;
 import br.com.estaghub.repository.SupervisorRepository;
 import br.com.estaghub.util.CryptUtil;
+import br.com.estaghub.util.HibernateUtil;
 
-import javax.persistence.*;
-import java.time.LocalDateTime;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
 import java.util.Objects;
 
 public class SupervisorRepositoryImpl implements SupervisorRepository {
-    EntityManagerFactory emf;
-    EntityManager em;
-    public SupervisorRepositoryImpl() {
-        this.emf = Persistence.createEntityManagerFactory("estaghub");
-        this.em = this.emf.createEntityManager();
-    }
+    EntityManager em = HibernateUtil.emf.createEntityManager();
 
     @Override
     public void criarSupervisor(Supervisor supervisor, Empresa empresa, String numPedido) {
         TypedQuery<Supervisor> query = em.createQuery("SELECT s FROM Supervisor s WHERE s.email = :email", Supervisor.class);
         query.setParameter("email", supervisor.getEmail());
         Pedido pedido = new Pedido();
+        EmpresaRepositoryImpl empresaRepository = new EmpresaRepositoryImpl();
         if (query.getResultList().isEmpty()){
-            if (Objects.isNull(empresa.getEmpresaByCnpj(empresa.getCnpj()))) {
+            if (Objects.isNull(empresaRepository.getEmpresaByCnpj(empresa.getCnpj()))) {
                 empresa.criarEmpresa(empresa);
             }
             supervisor.setEmpresa(empresa);
@@ -37,7 +32,6 @@ public class SupervisorRepositoryImpl implements SupervisorRepository {
             pedido.addSupervisorNoPedido(supervisor,numPedido);
         }
         em.close();
-        emf.close();
     }
     @Override
     public void vincularEmpresa(Supervisor supervisor, String cnpjEmpresaVinculada, String numPedido) {
@@ -57,33 +51,39 @@ public class SupervisorRepositoryImpl implements SupervisorRepository {
             }
         }
         em.close();
-        emf.close();
     }
 
     @Override
     public Long getIdSupervisor(Supervisor supervisor) {
-        TypedQuery<Supervisor> queryFinal = em.createQuery("SELECT e FROM Supervisor e WHERE e.email = :email", Supervisor.class);
-        queryFinal.setParameter("email", supervisor.getEmail());
-//            em.close();
-//            emf.close();
-        return queryFinal.getResultList().isEmpty()? null: queryFinal.getSingleResult().getId();
+        try {
+            TypedQuery<Supervisor> queryFinal = em.createQuery("SELECT e FROM Supervisor e WHERE e.email = :email", Supervisor.class);
+            queryFinal.setParameter("email", supervisor.getEmail());
+            return queryFinal.getResultList().isEmpty()? null: queryFinal.getSingleResult().getId();
+        }finally {
+            em.close();
+        }
     }
     public Supervisor getSupervisorByEmail(String email) {
-
-        TypedQuery<Supervisor> queryFinal = em.createQuery("SELECT e FROM Supervisor e WHERE e.email = :email", Supervisor.class);
-        queryFinal.setParameter("email", email);
-//            em.close();
-//            emf.close();
-        return queryFinal.getResultList().isEmpty()? null: queryFinal.getSingleResult();
+        try {
+            TypedQuery<Supervisor> queryFinal = em.createQuery("SELECT e FROM Supervisor e WHERE e.email = :email", Supervisor.class);
+            queryFinal.setParameter("email", email);
+            return queryFinal.getResultList().isEmpty()? null: queryFinal.getSingleResult();
+        }finally {
+            em.close();
+        }
     }
     @Override
     public Boolean loginSupervisor(String email, String senha) {
-        TypedQuery<Supervisor> query = em.createQuery("SELECT s FROM Supervisor s WHERE s.email = :email", Supervisor.class);
-        query.setParameter("email", email);
-        if (!query.getResultList().isEmpty()){
-            return CryptUtil.checkPassword(senha, query.getSingleResult().getSenha());
+        try {
+            TypedQuery<Supervisor> query = em.createQuery("SELECT s FROM Supervisor s WHERE s.email = :email", Supervisor.class);
+            query.setParameter("email", email);
+            if (!query.getResultList().isEmpty()){
+                return CryptUtil.checkPassword(senha, query.getSingleResult().getSenha());
+            }
+            return false;
+        }finally {
+            em.close();
         }
-        return false;
     }
 //    @Override
 //    public void addFormacaoSupervisor(String idPedido, String formacao) {
