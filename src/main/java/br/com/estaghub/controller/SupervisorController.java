@@ -48,7 +48,7 @@ public class SupervisorController extends HttpServlet {
         Pedido pedido = new Pedido();
         HttpSession session = req.getSession();
         try{
-            if ("logout".equals(req.getParameter("buttonLogoutDocenteComissao"))){
+            if ("logout".equals(req.getParameter("buttonLogoutSupervisor"))){
                 session.invalidate();
                 RequestDispatcher view = req.getRequestDispatcher(LOGOUT);
                 view.forward(req,resp);

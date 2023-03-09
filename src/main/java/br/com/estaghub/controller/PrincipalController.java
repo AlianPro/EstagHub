@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Objects;
 
 @WebServlet(name = "PrincipalController", value = "/principalController")
 public class PrincipalController extends HttpServlet {
@@ -27,6 +28,13 @@ public class PrincipalController extends HttpServlet {
     private static final String SUCESS_DOCENTE_COMISSAO = "/docenteComissao.jsp";
     private static final String SUCESS_SUPERVISOR = "/supervisor.jsp";
     private static final String FAILED = "/index.jsp";
+
+    @Override
+    public void init() throws ServletException {
+        Empresa empresa = new Empresa();
+        getServletContext().setAttribute("LIST_EMPRESAS",empresa.listAllEmpresa());
+    }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
@@ -54,11 +62,27 @@ public class PrincipalController extends HttpServlet {
                                 session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get());
                                 session.setAttribute("ID_PEDIDO",pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId());
                                 if ("NOVO_STEP4_PLANO_ATIVIDADES".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name()) || "NOVO_STEP4_ATIVIDADES_TCE".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())){
-                                    session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).get());
+                                    if (documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).isPresent()){
+                                        session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).get());
+                                    }
+                                }else if ("NOVO_STEP3".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())) {
+                                    if (!S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TCE).get(1).isBlank()){
+                                        session.setAttribute("TCE_MODELO_UFRRJ", S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TCE).get(0));
+                                        session.setAttribute("TCE_MODELO_UFRRJ_URL", S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TCE).get(1));
+                                    }
+                                    session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
                                 }else if ("NOVO_STEP4_TCE".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())) {
-                                    session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
+                                    if (!S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TCE).get(1).isBlank()){
+                                        session.setAttribute("TCE_MODELO_UFRRJ", S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TCE).get(0));
+                                        session.setAttribute("TCE_MODELO_UFRRJ_URL", S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TCE).get(1));
+                                    }
+                                    if (documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).isPresent()){
+                                        session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
+                                    }
                                 }else if ("NOVO_STEP4_ATIVIDADES_TCE".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())) {
-                                    session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.TCE).get());
+                                    if (documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).isPresent()){
+                                        session.setAttribute("DOCUMENTO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).get());
+                                    }
                                 }else if("NOVO_STEP3_DISCENTE_ASSINADO".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getStatus().name())){
                                     if (S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome()).isBlank()){
                                         session.setAttribute("PLANO_ATIVIDADES", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.NOVO).get().getId(), TipoDocumento.PLANO_ATIVIDADES).get());
@@ -84,8 +108,22 @@ public class PrincipalController extends HttpServlet {
                             }else if (!pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).isEmpty()) {
                                 session.setAttribute("RENOVACAO_ESTAGIO", pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get());
                                 session.setAttribute("ID_PEDIDO",pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId());
-                                if(documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO).isPresent()){
-                                    session.setAttribute("DOCUMENTO_TERMO_ADITIVO",documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(),TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO).get());
+                                if("RENOVACAO_STEP4_DISCENTE_ASSINADO".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getStatus().name())){
+                                    if (!S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO).get().getNome()).isBlank()){
+                                        session.setAttribute("TERMO_ADITIVO", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO).get());
+                                        session.setAttribute("TERMO_ADITIVO_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO).get().getNome()));
+                                    }else if (!S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get().getNome()).isBlank()){
+                                        session.setAttribute("TERMO_ADITIVO", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get());
+                                        session.setAttribute("TERMO_ADITIVO_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get().getNome()));
+                                    }
+                                }else if("RENOVACAO_STEP4".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getStatus().name())){
+                                    if(!S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TERMO_ADITIVO).get(1).isBlank()){
+                                        session.setAttribute("TERMO_ADITIVO_MODELO_UFRRJ", S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TERMO_ADITIVO).get(0));
+                                        session.setAttribute("TERMO_ADITIVO_MODELO_UFRRJ_URL", S3Util.getTceOrTermoAditivoFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"), TipoDocumento.TERMO_ADITIVO).get(1));
+                                    }
+                                }else if ("NOVO_PEDIDO_FIM".equals(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getStatus().name())) {
+                                    session.setAttribute("TERMO_ADITIVO", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get());
+                                    session.setAttribute("TERMO_ADITIVO_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteByEmail(email).get(), TipoPedido.RENOVACAO).get().getId(), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get().getNome()));
                                 }
                             }
                             session.setAttribute("LIST_CURSOS",curso.getAllCursos());
@@ -143,6 +181,8 @@ public class PrincipalController extends HttpServlet {
                 DiscenteMapperImpl discenteMapper = new DiscenteMapperImpl();
                 Discente discente = discenteMapper.toDiscenteCreateAccount(discenteDTO);
                 discente.criarDiscente(discente);
+                RequestDispatcher view = req.getRequestDispatcher(FAILED);
+                view.forward(req,resp);
             }
             if ("supervisor".equals(req.getParameter("submitButtonSupervisor1"))){
                 SupervisorCreationDTO supervisorDTO = SupervisorCreationDTO.builder().nome(req.getParameter("nameSupervisor"))
@@ -156,7 +196,7 @@ public class PrincipalController extends HttpServlet {
                 String cnpjEmpresaVinculada = req.getParameter("selectVinculoSupervisorEmpresa");
                 SupervisorMapperImpl supervisorMapper = new SupervisorMapperImpl();
                 Supervisor supervisor = supervisorMapper.toSupervisorCreateAccount(supervisorDTO);
-                if (!cnpjEmpresaVinculada.isBlank() && pedido.getPedidoByIdWhereSupervisorNotSet(numPedido)){
+                if (!cnpjEmpresaVinculada.isBlank() && !pedido.getPedidoByIdWhereSupervisorNotSet(numPedido)){
                     supervisor.vincularEmpresa(supervisor, cnpjEmpresaVinculada, numPedido);
                 }
             }
@@ -179,7 +219,7 @@ public class PrincipalController extends HttpServlet {
                 EmpresaMapperImpl empresaMapper = new EmpresaMapperImpl();
                 Supervisor supervisor = supervisorMapper.toSupervisorCreateAccount(supervisorDTO);
                 Empresa empresa = empresaMapper.toEmpresaCreateAccount(empresaDTO);
-                if (!numPedido.equals("") && pedido.getPedidoByIdWhereSupervisorNotSet(numPedido)){
+                if (!numPedido.equals("") && !pedido.getPedidoByIdWhereSupervisorNotSet(numPedido)){
                     supervisor.criarSupervisor(supervisor, empresa, numPedido);
                 }
             }

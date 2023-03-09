@@ -2,6 +2,7 @@ package br.com.estaghub.repository.impl;
 
 import br.com.estaghub.domain.*;
 import br.com.estaghub.enums.TipoDocumento;
+import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.repository.DocumentoRepository;
 import br.com.estaghub.util.HibernateUtil;
 
@@ -68,7 +69,6 @@ public class DocumentoRepositoryImpl implements DocumentoRepository {
     @Override
     public void addTCEInDocumento(String idDocumento, TCE tce) {
         Query query = em.createQuery("UPDATE Documento set nome_empresa_tce = :nome_empresa_tce, cnpj_empresa_tce = :cnpj_empresa_tce, horario_inicio_tce = :horario_inicio_tce, horario_fim_tce = :horario_fim_tce, total_horas_tce = :total_horas_tce , intervalo_tce = :intervalo_tce , data_inicio_tce = :data_inicio_tce , data_fim_tce = :data_fim_tce , bolsa_tce = :bolsa_tce , aux_transporte_tce = :aux_transporte_tce , cod_apolice_tce = :cod_apolice_tce , nome_seguradora_tce = :nome_seguradora_tce , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :idDocumento");
-        query.setParameter("nome_empresa_tce", tce.getNomeEmpresa());
         query.setParameter("cnpj_empresa_tce", tce.getCnpjEmpresa());
         query.setParameter("horario_inicio_tce", tce.getHorarioInicio());
         query.setParameter("horario_fim_tce", tce.getHorarioFim());

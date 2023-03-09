@@ -144,8 +144,10 @@ public class DocenteController extends HttpServlet {
                         RequestDispatcher view = req.getRequestDispatcher(PEDIDOS_COMISSAO);
                         view.forward(req,resp);
                     }else{
+                        String idDocente = req.getParameter("selectDocenteOrientador");
                         pedido.changeStatusPedido(idPedido.toString(),StatusPedido.RENOVACAO_STEP3);
                         pedido.addDocenteComissaoInPedido(idPedido.toString(),docente.getDocenteByEmail(emailDocente.toString()).get());
+                        pedido.addDocenteOrientadorInPedido(idPedido.toString(),docente.getDocenteById(Long.parseLong(idDocente)));
                         session.setAttribute("LIST_PEDIDOS",pedido.getAllPedidos());
                         RequestDispatcher view = req.getRequestDispatcher(PEDIDOS_COMISSAO);
                         view.forward(req,resp);
@@ -183,7 +185,9 @@ public class DocenteController extends HttpServlet {
                         RequestDispatcher view = req.getRequestDispatcher(PEDIDOS_COMISSAO);
                         view.forward(req,resp);
                     }else{
+                        String idDocente = req.getParameter("selectDocenteOrientador");
                         pedido.changeStatusPedido(idPedido.toString(),StatusPedido.RENOVACAO_STEP3);
+                        pedido.addDocenteOrientadorInPedido(idPedido.toString(),docente.getDocenteById(Long.parseLong(idDocente)));
                         session.setAttribute("LIST_PEDIDOS",pedido.getAllPedidos());
                         RequestDispatcher view = req.getRequestDispatcher(PEDIDOS_COMISSAO);
                         view.forward(req,resp);

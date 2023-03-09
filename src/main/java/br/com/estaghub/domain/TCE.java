@@ -13,7 +13,6 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor
 @Embeddable
 public class TCE {
-    private String nomeEmpresa;
     private String cnpjEmpresa;
     private String horarioInicio;
     private String horarioFim;

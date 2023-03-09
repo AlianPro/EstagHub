@@ -49,7 +49,6 @@ public class Documento {
     private PlanoAtividades planoAtividades;
     @Embedded
     @AttributeOverrides({
-            @AttributeOverride(name = "nomeEmpresa", column = @Column(name = "nome_empresa_tce")),
             @AttributeOverride(name = "cnpjEmpresa", column = @Column(name = "cnpj_empresa_tce")),
             @AttributeOverride(name = "horarioInicio", column = @Column(name = "horario_inicio_tce")),
             @AttributeOverride(name = "horarioFim", column = @Column(name = "horario_fim_tce")),

@@ -31,9 +31,11 @@ public class DiscenteController extends HttpServlet {
     private static final String SUCESS_DISCENTE = "/discente.jsp";
     private static final String NOVO_STEP3 = "/emitirTCE.jsp";
     private static final String DISCENTE_ASSINA_DOCUMENTO = "/assinarDocumentoDiscente.jsp";
+    private static final String FINAL_STEP = "/finalStep.jsp";
     private static final String SUCESS_DOCENTE = "/docente.jsp";
     private static final String SUCESS_SUPERVISOR = "/supervisor.jsp";
     private static final String NOVO_ESTAGIO = "/novoEstagio.jsp";
+    private static final String NOVO_ESTAGIO_REJEITADO = "/justificativaNovoEstagio.jsp";
     private static final String RENOVACAO_ESTAGIO = "/renovacaoEstagio.jsp";
     private static final String LOGOUT = "/index.jsp";
     @Override
@@ -122,16 +124,32 @@ public class DiscenteController extends HttpServlet {
         });
         TermoAditivo termoAditivo = termoAditivoMapper.toDiscenteCreateDocumento(termoAditivoCreationDTO);
         if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).isEmpty()){
-            documentoService.gerarTermoAditivo(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TERMO_ADITIVO, termoAditivoCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())),pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())));
-            Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getId();
-            FileUtil.criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.RENOVACAO, TipoDocumento.TERMO_ADITIVO);
-            documento.addTermoAditivoInDocumento(String.valueOf(idDocumento),termoAditivo);
-            S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getNome());
-            session.setAttribute("TERMO_ADITIVO_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getNome()));
-            pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.RENOVACAO_STEP4_DISCENTE_ASSINADO);
-            session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
-            RequestDispatcher view = req.getRequestDispatcher(DISCENTE_ASSINA_DOCUMENTO);
-            view.forward(req, resp);
+            if (req.getParts().stream().anyMatch(part -> "fileTermoAditivoAssinado".equals(part.getName()))){
+                FileUtil.armazenarDocumentoAssinadoDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), req.getParts().stream().filter(part -> "fileTermoAditivoAssinado".equals(part.getName())).findFirst().get(),TipoPedido.RENOVACAO);
+                if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).isPresent()){
+                    documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE);
+                }
+                FileUtil.criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.RENOVACAO, TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "fileTermoAditivoAssinado".equals(part.getName())).findFirst());
+                S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get().getNome());
+                session.setAttribute("TERMO_ADITIVO_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get().getNome()));
+                session.setAttribute("TERMO_ADITIVO",documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get());
+                pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_PEDIDO_FIM);
+                session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
+                RequestDispatcher view = req.getRequestDispatcher(FINAL_STEP);
+                view.forward(req, resp);
+            }else{
+                documentoService.gerarTermoAditivo(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TERMO_ADITIVO, termoAditivoCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())),pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())));
+                FileUtil.criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.RENOVACAO, TipoDocumento.TERMO_ADITIVO);
+                Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getId();
+                documento.addTermoAditivoInDocumento(String.valueOf(idDocumento),termoAditivo);
+                S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getNome());
+                session.setAttribute("TERMO_ADITIVO_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get().getNome()));
+                session.setAttribute("TERMO_ADITIVO",documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO).get());
+                pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.RENOVACAO_STEP4_DISCENTE_ASSINADO);
+                session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
+                RequestDispatcher view = req.getRequestDispatcher(DISCENTE_ASSINA_DOCUMENTO);
+                view.forward(req, resp);
+            }
         }
     }
     private void discenteAssinarDocumento(HttpServletRequest req, HttpServletResponse resp) throws IOException, ServletException {
@@ -165,6 +183,23 @@ public class DiscenteController extends HttpServlet {
                 RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
                 view.forward(req, resp);
             }
+        }else if ("RENOVACAO".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getTipo().name())){
+            if ("RENOVACAO_STEP4_DISCENTE_ASSINADO".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getStatus().name())){
+                if (req.getParts().stream().anyMatch(part -> "termoAditivoAssinado".equals(part.getName()))){
+                    FileUtil.armazenarDocumentoAssinadoDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), req.getParts().stream().filter(part -> "termoAditivoAssinado".equals(part.getName())).findFirst().get(),TipoPedido.RENOVACAO);
+                    if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).isPresent()){
+                        documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE);
+                    }
+                    FileUtil.criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.RENOVACAO, TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "termoAditivoAssinado".equals(part.getName())).findFirst());
+                    S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get().getNome());
+                }
+                pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_PEDIDO_FIM);
+                session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
+                session.setAttribute("TERMO_ADITIVO", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getId(), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get());
+                session.setAttribute("TERMO_ADITIVO_URL", S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getId(), TipoDocumento.TERMO_ADITIVO_ASSINADO_DISCENTE).get().getNome()));
+                RequestDispatcher view = req.getRequestDispatcher(FINAL_STEP);
+                view.forward(req, resp);
+            }
         }
     }
 
@@ -178,9 +213,7 @@ public class DiscenteController extends HttpServlet {
         Documento documento = new Documento();
         req.getParts().stream().forEach(part -> {
             try{
-                if (part.getName().equals("nomeEmpresa")){
-                    tceCreationDTO.setNomeEmpresa(IOUtils.toString(part.getInputStream()));
-                }else if (part.getName().equals("cnpjEmpresa")){
+                if (part.getName().equals("cnpjEmpresa")){
                     tceCreationDTO.setCnpjEmpresa(IOUtils.toString(part.getInputStream()));
                 }else if (part.getName().equals("horarioInicio")){
                     tceCreationDTO.setHorarioInicio(IOUtils.toString(part.getInputStream()));
@@ -209,28 +242,54 @@ public class DiscenteController extends HttpServlet {
         });
         TCE tce = tceMapper.toDiscenteCreateDocumento(tceCreationDTO);
         if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).isEmpty()){
-            documentoService.gerarTCE(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TCE, tceCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())));
-            FileUtil.criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE);
-            Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getId();
-            documento.addTCEInDocumento(String.valueOf(idDocumento),tce);
-            S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome());
-            session.setAttribute("TCE_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome()));
-            session.setAttribute("TCE",documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get());
-            pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP3_DISCENTE_ASSINADO);
-            session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
-            RequestDispatcher view = req.getRequestDispatcher(DISCENTE_ASSINA_DOCUMENTO);
-            view.forward(req, resp);
+            if (req.getParts().stream().anyMatch(part -> "fileTCEAssinado".equals(part.getName()))){
+                FileUtil.armazenarDocumentoAssinadoDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), req.getParts().stream().filter(part -> "fileTCEAssinado".equals(part.getName())).findFirst().get(),TipoPedido.NOVO);
+                if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE).isPresent()){
+                    documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE);
+                }
+                FileUtil.criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "fileTCEAssinado".equals(part.getName())).findFirst());
+                S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP4);
+                session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
+                RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
+                view.forward(req, resp);
+            }else{
+                documentoService.gerarTCE(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TCE, tceCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())));
+                FileUtil.criarDocumentoEstagio(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE);
+                Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getId();
+                documento.addTCEInDocumento(String.valueOf(idDocumento),tce);
+                S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome());
+                session.setAttribute("TCE_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome()));
+                session.setAttribute("TCE",documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get());
+                pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP3_DISCENTE_ASSINADO);
+                session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
+                RequestDispatcher view = req.getRequestDispatcher(DISCENTE_ASSINA_DOCUMENTO);
+                view.forward(req, resp);
+            }
         }else if ("NOVO_STEP4_TCE".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getStatus().name())){
-            Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getId();
-            documentoService.gerarTCE(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TCE, tceCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())));
-            documento.addTCEInDocumento(String.valueOf(idDocumento),tce);
-            S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome());
-            session.setAttribute("TCE_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome()));
-            session.setAttribute("TCE",documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get());
-            pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP3_DISCENTE_ASSINADO);
-            session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
-            RequestDispatcher view = req.getRequestDispatcher(DISCENTE_ASSINA_DOCUMENTO);
-            view.forward(req, resp);
+            if (req.getParts().stream().anyMatch(part -> "fileTCEAssinado".equals(part.getName()))){
+                FileUtil.armazenarDocumentoAssinadoDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), req.getParts().stream().filter(part -> "fileTCEAssinado".equals(part.getName())).findFirst().get(),TipoPedido.NOVO);
+                if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE).isPresent()){
+                    documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE);
+                }
+                FileUtil.criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), TipoPedido.NOVO, TipoDocumento.TCE_ASSINADO_DISCENTE, req.getParts().stream().filter(part -> "fileTCEAssinado".equals(part.getName())).findFirst());
+                S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP4);
+                session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
+                RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
+                view.forward(req, resp);
+            }else{
+                Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getId();
+                documentoService.gerarTCE(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TCE, tceCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())));
+                documento.addTCEInDocumento(String.valueOf(idDocumento),tce);
+                S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome());
+                session.setAttribute("TCE_URL",S3Util.getFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome()));
+                session.setAttribute("TCE",documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get());
+                pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),StatusPedido.NOVO_STEP3_DISCENTE_ASSINADO);
+                session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
+                RequestDispatcher view = req.getRequestDispatcher(DISCENTE_ASSINA_DOCUMENTO);
+                view.forward(req, resp);
+            }
         }
     }
 
@@ -367,9 +426,16 @@ public class DiscenteController extends HttpServlet {
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.HISTORICO_ACADEMICO).get().getNome());
                 FileUtil.criarDocumento(pedido, discente, TipoPedido.RENOVACAO, TipoDocumento.GRADE_HORARIO, req.getParts().stream().filter(part -> "gradeHorarioDiscente".equals(part.getName())).findFirst());
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.GRADE_HORARIO).get().getNome());
-                session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
-                RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
-                view.forward(req,resp);
+                if (Float.parseFloat(discente.getIra()) < 5){
+                    pedido.changeStatusPedido(String.valueOf(pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"),TipoPedido.RENOVACAO).get().getId()),StatusPedido.RENOVACAO_STEP3_REJEITADO);
+                    session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
+                    RequestDispatcher view = req.getRequestDispatcher(NOVO_ESTAGIO_REJEITADO);
+                    view.forward(req,resp);
+                }else{
+                    session.setAttribute("RENOVACAO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.RENOVACAO).get());
+                    RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
+                    view.forward(req,resp);
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -421,9 +487,16 @@ public class DiscenteController extends HttpServlet {
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.HISTORICO_ACADEMICO).get().getNome());
                 FileUtil.criarDocumento(pedido, discente, TipoPedido.NOVO, TipoDocumento.GRADE_HORARIO, req.getParts().stream().filter(part -> "gradeHorarioDiscente".equals(part.getName())).findFirst());
                 S3Util.uploadFileS3(getContextParameter("access-key"),getContextParameter("secret-key"),getContextParameter("estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getId(), TipoDocumento.GRADE_HORARIO).get().getNome());
-                session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
-                RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
-                view.forward(req,resp);
+                if (Float.parseFloat(discente.getIra()) < 6 || (Float.parseFloat(discente.getCargaHorariaCumprida()) / 15) < 80){
+                    pedido.changeStatusPedido(String.valueOf(pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"),TipoPedido.NOVO).get().getId()),StatusPedido.NOVO_STEP2_REJEITADO);
+                    session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
+                    RequestDispatcher view = req.getRequestDispatcher(NOVO_ESTAGIO_REJEITADO);
+                    view.forward(req,resp);
+                }else{
+                    session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
+                    RequestDispatcher view = req.getRequestDispatcher(SUCESS_DISCENTE);
+                    view.forward(req,resp);
+                }
             }
         }catch (Exception e){
             e.printStackTrace();

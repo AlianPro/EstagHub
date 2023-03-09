@@ -56,6 +56,12 @@ public class FileUtil {
                     part.write(OUTPUT_FILE + File.separator + createNomeArquivo(String.valueOf(discente.getId()), "PLANO_ATIVIDADES_ASSINADO_DISCENTE", part));
                 }else if(part.getName().equals("tceAssinado")){
                     part.write(OUTPUT_FILE + File.separator + createNomeArquivo(String.valueOf(discente.getId()), "TCE_ASSINADO_DISCENTE", part));
+                }else if(part.getName().equals("termoAditivoAssinado")){
+                    part.write(OUTPUT_FILE + File.separator + createNomeArquivo(String.valueOf(discente.getId()), "TERMO_ADITIVO_ASSINADO_DISCENTE", part));
+                }else if(part.getName().equals("fileTCEAssinado")){
+                    part.write(OUTPUT_FILE + File.separator + createNomeArquivo(String.valueOf(discente.getId()), "TCE_ASSINADO_DISCENTE", part));
+                }else if(part.getName().equals("fileTermoAditivoAssinado")){
+                    part.write(OUTPUT_FILE + File.separator + createNomeArquivo(String.valueOf(discente.getId()), "TERMO_ADITIVO_ASSINADO_DISCENTE", part));
                 }
             }catch (Exception e){
                 e.printStackTrace();

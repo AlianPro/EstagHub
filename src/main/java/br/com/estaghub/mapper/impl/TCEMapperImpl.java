@@ -8,8 +8,7 @@ public class TCEMapperImpl implements TCEMapper {
 
     @Override
     public TCE toDiscenteCreateDocumento(TCECreationDTO tceCreationDTO) {
-        return TCE.builder().nomeEmpresa(tceCreationDTO.getNomeEmpresa())
-                .cnpjEmpresa(tceCreationDTO.getCnpjEmpresa())
+        return TCE.builder().cnpjEmpresa(tceCreationDTO.getCnpjEmpresa())
                 .horarioInicio(tceCreationDTO.getHorarioInicio())
                 .horarioFim(tceCreationDTO.getHorarioFim())
                 .totalHoras(tceCreationDTO.getTotalHoras())

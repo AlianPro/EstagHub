@@ -19,9 +19,8 @@ public class SupervisorRepositoryImpl implements SupervisorRepository {
         TypedQuery<Supervisor> query = em.createQuery("SELECT s FROM Supervisor s WHERE s.email = :email", Supervisor.class);
         query.setParameter("email", supervisor.getEmail());
         Pedido pedido = new Pedido();
-        EmpresaRepositoryImpl empresaRepository = new EmpresaRepositoryImpl();
         if (query.getResultList().isEmpty()){
-            if (Objects.isNull(empresaRepository.getEmpresaByCnpj(empresa.getCnpj()))) {
+            if (Objects.isNull(empresa.getEmpresaByCnpj(empresa.getCnpj()))) {
                 empresa.criarEmpresa(empresa);
             }
             supervisor.setEmpresa(empresa);

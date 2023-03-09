@@ -12,8 +12,6 @@ import org.apache.logging.log4j.core.config.plugins.validation.constraints.NotBl
 @NoArgsConstructor
 public class TCECreationDTO {
     @NotBlank
-    private String nomeEmpresa;
-    @NotBlank
     private String cnpjEmpresa;
     @NotBlank
     private String horarioInicio;

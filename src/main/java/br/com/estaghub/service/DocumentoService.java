@@ -1,12 +1,14 @@
 package br.com.estaghub.service;
 
 import br.com.estaghub.domain.Discente;
+import br.com.estaghub.domain.Documento;
 import br.com.estaghub.domain.Empresa;
 import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.dto.PlanoAtividadesCreationDTO;
 import br.com.estaghub.dto.TCECreationDTO;
 import br.com.estaghub.dto.TermoAditivoCreationDTO;
 import br.com.estaghub.enums.TipoDocumento;
+import br.com.estaghub.enums.TipoPedido;
 import org.apache.poi.hwpf.HWPFDocument;
 import org.apache.poi.hwpf.usermodel.CharacterRun;
 import org.apache.poi.hwpf.usermodel.Paragraph;
@@ -106,12 +108,14 @@ public class DocumentoService {
     public void gerarTCE(String idDiscente, TipoDocumento tipoDocumento, TCECreationDTO tceCreationDTO, Discente discente){
         try{
             DocumentoService instance = new DocumentoService();
+            Pedido pedido = new Pedido();
+            Documento documento = new Documento();
             DecimalFormat dmFormat = new DecimalFormat("00");
             if (tipoDocumento == TipoDocumento.TCE){
                 HWPFDocument doc = instance.openDocument(TCE);
                 if (doc != null) {
                     doc = instance.replaceText(doc, "{nomeDiscente}", discente.getNome());
-                    doc = instance.replaceText(doc, "{nomeConcedente}", tceCreationDTO.getNomeEmpresa());
+                    doc = instance.replaceText(doc, "{nomeConcedente}", documento.getDocumentoByIdPedidoAndTipoDocumento(pedido.getPedidoByDiscente(discente.getDiscenteById(Long.parseLong(idDiscente)), TipoPedido.NOVO).get().getId(),TipoDocumento.PLANO_ATIVIDADES).get().getPlanoAtividades().getNomeEmpresa());
                     doc = instance.replaceText(doc, "{cnpjConcedente}", tceCreationDTO.getCnpjEmpresa());
                     doc = instance.replaceText(doc, "{periodoCurso}", discente.getPeriodo());
                     doc = instance.replaceText(doc, "{nomeCurso}", discente.getCurso().getNome());
