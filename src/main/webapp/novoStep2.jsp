@@ -255,22 +255,20 @@
                                         Ops! Informe uma justificativa para rejeitar esse pedido.
                                     </div>
                                 </div>
-                                <c:if test="${'NOVO' == PEDIDO.tipo.name()}">
-                                    <div class="form-floating mb-3" id="selectDocente">
-                                        <select name="selectDocenteOrientador" class="form-select" id="selectDocenteOrientador" required>
-                                            <option value="">Docente Orientador</option>
-                                            <c:forEach var="docente" items="${DOCENTES_NAO_COMISSAO}">
-                                                <option value="${docente.id}">${docente.nome}</option>
-                                            </c:forEach>
-                                        </select>
-                                        <div class="valid-feedback">
-                                            Perfeito!
-                                        </div>
-                                        <div class="invalid-feedback">
-                                            Ops! Escolha um Docente Orientador.
-                                        </div>
+                                <div class="form-floating mb-3" id="selectDocente">
+                                    <select name="selectDocenteOrientador" class="form-select" id="selectDocenteOrientador" required>
+                                        <option value="">Docente Orientador</option>
+                                        <c:forEach var="docente" items="${DOCENTES_NAO_COMISSAO}">
+                                            <option value="${docente.id}">${docente.nome}</option>
+                                        </c:forEach>
+                                    </select>
+                                    <div class="valid-feedback">
+                                        Perfeito!
                                     </div>
-                                </c:if>
+                                    <div class="invalid-feedback">
+                                        Ops! Escolha um Docente Orientador.
+                                    </div>
+                                </div>
                                 <div role="toolbar" style="text-align: right">
                                     <button class="btn btn-primary" type="submit" id="submitButtonDocenteAnalisaNovoPedido1" name="submitButtonDocenteAnalisaNovoPedido1" value="step1">Enviar</button>
                                 </div>

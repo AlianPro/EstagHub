@@ -170,7 +170,7 @@
             <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                <a href="index.jsp" id="buttonLogoutDiscente" name="buttonLogoutDiscente" type="submit" class="btn btn-primary" onclick="logoutDiscente()">Logout</a>
+                <a href="index.jsp" id="buttonLogoutDiscente" name="buttonLogoutDiscente" type="submit" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</a>
             </div>
         </div>
     </div>

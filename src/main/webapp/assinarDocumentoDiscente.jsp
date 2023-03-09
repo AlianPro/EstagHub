@@ -321,12 +321,10 @@
                                 </c:if>
                             </c:if>
                             <c:if test="${'RENOVACAO' == RENOVACAO_ESTAGIO.tipo.name()}">
-                                <c:if test="${'TERMO_ADITIVO' == TERMO_ADITIVO.tipoDocumento.name()}">
-                                    <div class="form-floating mb-3">
-                                        <label for="termoAditivoAntigo">Download do Termo Aditivo:</label>
-                                        <a id="termoAditivoAntigo" href="${TERMO_ADITIVO_URL}">${TERMO_ADITIVO.nome}</a>
-                                    </div>
-                                </c:if>
+                                <div class="form-floating mb-3">
+                                    <label for="termoAditivoAntigo">Download do Termo Aditivo:</label>
+                                    <a id="termoAditivoAntigo" href="${TERMO_ADITIVO_URL}">${TERMO_ADITIVO.nome}</a>
+                                </div>
                             </c:if>
                             <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
                                 <c:if test="${'PLANO_ATIVIDADES' == PLANO_ATIVIDADES.tipoDocumento.name()}">
@@ -337,31 +335,31 @@
                                             Perfeito!
                                         </div>
                                         <div class="invalid-feedback">
-                                            Ops! Anexe o Plano de Atividades assinado.
+                                            Ops! Anexe o Plano de Atividades Assinado.
                                         </div>
                                     </div>
                                 </c:if>
                                 <c:if test="${'TCE' == TCE.tipoDocumento.name()}">
                                     <div class="form-floating mb-3">
-                                        <label for="tceAssinado">Anexe o TCE assinado:</label>
+                                        <label for="tceAssinado">Anexe o TCE UFRRJ ou Modelo da Empresa Assinado:</label>
                                         <input id="tceAssinado" name="tceAssinado" required type="file" accept=".doc"/>
                                         <div class="valid-feedback">
                                             Perfeito!
                                         </div>
                                         <div class="invalid-feedback">
-                                            Ops! Anexe o TCE assinado.
+                                            Ops! Anexe o TCE Assinado.
                                         </div>
                                     </div>
                                 </c:if>
-                                <c:if test="${'TERMO_ADITIVO' == TERMO_ADITIVO.tipoDocumento.name()}">
+                                <c:if test="${'RENOVACAO' == RENOVACAO_ESTAGIO.tipo.name()}">
                                     <div class="form-floating mb-3">
-                                        <label for="termoAditivoAssinado">Anexe o Termo Aditivo assinado:</label>
+                                        <label for="termoAditivoAssinado">Anexe o Termo Aditivo UFRRJ ou Modelo da Empresa Assinado:</label>
                                         <input id="termoAditivoAssinado" name="termoAditivoAssinado" required type="file" accept=".doc"/>
                                         <div class="valid-feedback">
                                             Perfeito!
                                         </div>
                                         <div class="invalid-feedback">
-                                            Ops! Anexe o Termo Aditivo assinado.
+                                            Ops! Anexe o Termo Aditivo Assinado.
                                         </div>
                                     </div>
                                 </c:if>

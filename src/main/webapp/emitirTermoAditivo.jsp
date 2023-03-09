@@ -84,6 +84,24 @@
                 }
             });
         }
+        function hideTextAreaTermoAditivoPreenchido(){
+            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
+            $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
+            $("#termoAditivoAssinado").children().prop('disabled',false);
+            $("#termoAditivoAssinado").prop('hidden',false);
+        }
+        function hideTextAreaTermoAditivoPreenchidoEmpresa(){
+            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
+            $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
+            $("#termoAditivoAssinado").children().prop('disabled',true);
+            $("#termoAditivoAssinado").prop('hidden',true);
+        }
+        function hideTextAreaTermoAditivoPreenchidoUFRRJ(){
+            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',false);
+            $("#modeloTermoAditivoUFRRJ").prop('hidden',false);
+            $("#termoAditivoAssinado").children().prop('disabled',true);
+            $("#termoAditivoAssinado").prop('hidden',true);
+        }
     </script>
 
 </head>
@@ -237,6 +255,39 @@
                 <div class="sw sw-theme-basic sw-justified">
                     <div class="tab-content">
                         <div class="tab-pane" style="display: block">
+                            <div class="form-outline mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoEmpresa" value="empresa" required onclick="hideTextAreaTermoAditivoPreenchidoEmpresa()">
+                                    <label class="form-check-label" for="termoAditivoEmpresa">Enviar Termo Aditivo Usando o Modelo da Empresa</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoBranco" value="branco" required onclick="hideTextAreaTermoAditivoPreenchidoUFRRJ()">
+                                    <label class="form-check-label" for="termoAditivoBranco">Enviar Termo Aditivo Usando o Modelo da UFRRJ em Branco</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoGerar" value="gerar" required onclick="hideTextAreaTermoAditivoPreenchido()">
+                                    <label class="form-check-label" for="termoAditivoGerar">Gerar Termo Aditivo</label>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3" id="modeloTermoAditivoUFRRJ" hidden>
+                                <label for="termoAditivoDiscente">Visualizar o Modelo de Termo Aditivo da UFRRJ:</label>
+                                <a id="termoAditivoDiscente" href="${TERMO_ADITIVO_MODELO_UFRRJ_URL}">${TERMO_ADITIVO_MODELO_UFRRJ}</a>
+                            </div>
+                            <form class="needs-validation" enctype="multipart/form-data" novalidate id="termoAditivoAssinado" name="discenteForm" action="discenteController" method="post" hidden>
+                                <div class="form-floating mb-3">
+                                    <label for="fileTCEAssinado">Anexe o Termo Aditivo Preenchido e Assinado:</label>
+                                    <input id="fileTCEAssinado" name="fileTermoAditivoAssinado" required type="file" accept=".doc, .docx, .pdf"/>
+                                    <div class="valid-feedback">
+                                        Perfeito!
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Ops! Anexe o Termo Aditivo Preenchido e Assinado.
+                                    </div>
+                                </div>
+                                <div role="toolbar" style="text-align: right">
+                                    <button class="btn btn-primary" type="submit" id="submitButtonDiscenteTermoAditivoAnexo" name="submitButtonDiscenteTermoAditivo" value="termoAditivo">Enviar</button>
+                                </div>
+                            </form>
                             <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
                                 <div class="form-floating mb-3">
                                     <label for="dataInicioAditivo">Data Antiga para Fim de Estágio</label>

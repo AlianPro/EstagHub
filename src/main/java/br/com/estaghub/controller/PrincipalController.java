@@ -30,12 +30,6 @@ public class PrincipalController extends HttpServlet {
     private static final String FAILED = "/index.jsp";
 
     @Override
-    public void init() throws ServletException {
-        Empresa empresa = new Empresa();
-        getServletContext().setAttribute("LIST_EMPRESAS",empresa.listAllEmpresa());
-    }
-
-    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 
     }

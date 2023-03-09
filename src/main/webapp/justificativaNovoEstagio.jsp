@@ -292,17 +292,51 @@
                     <div class="tab-content">
                         <div class="tab-pane" style="display: block">
                             <c:choose>
-                                <c:when test="${'NOVO' == PEDIDO.tipo.name()}">
-                                    <div class="form-floating mb-3">
-                                        <label for="justificativaComissaso">Requisito(s) não Cumprido(s)</label>
-                                        <p class="form-control" id="justificativaComissaso" readonly>${NOVO_ESTAGIO.justificativaDocente}</p>
-                                    </div>
+                                <c:when test="${'NOVO' == NOVO_ESTAGIO.tipo.name()}">
+                                    <c:choose>
+                                        <c:when test="${not empty NOVO_ESTAGIO.justificativaDocente}">
+                                            <div class="form-floating mb-3">
+                                                <label for="justificativaComissaso">Requisito(s) não Cumprido(s)</label>
+                                                <p class="form-control" id="justificativaComissaso" readonly>${NOVO_ESTAGIO.justificativaDocente}</p>
+                                            </div>
+                                        </c:when>
+                                        <c:when test="${Float.parseFloat(NOVO_ESTAGIO.discente.getIra()) < 6 && (Float.parseFloat(NOVO_ESTAGIO.discente.getCargaHorariaCumprida()) / 15) < 80}">
+                                            <div class="form-floating mb-3">
+                                                <label for="erroIraCarga">Requisito(s) não Cumprido(s)</label>
+                                                <p class="form-control" id="erroIraCarga" readonly>Ira Abaixo do Necessário e Carga Horária Cumprida de Obrigatória Abaixo do Necessário</p>
+                                            </div>
+                                        </c:when>
+                                        <c:when test="${(Float.parseFloat(NOVO_ESTAGIO.discente.getCargaHorariaCumprida()) / 15) < 80}">
+                                            <div class="form-floating mb-3">
+                                                <label for="erroCargaHoraria">Requisito(s) não Cumprido(s)</label>
+                                                <p class="form-control" id="erroCargaHoraria" readonly>Carga Horária Cumprida de Obrigatória Abaixo do Necessário</p>
+                                            </div>
+                                        </c:when>
+                                        <c:when test="${Float.parseFloat(NOVO_ESTAGIO.discente.getIra()) < 6}">
+                                            <div class="form-floating mb-3">
+                                                <label for="erroIra">Requisito(s) não Cumprido(s)</label>
+                                                <p class="form-control" id="erroIra" readonly>Ira Abaixo do Necessário</p>
+                                            </div>
+                                        </c:when>
+                                    </c:choose>
                                 </c:when>
-                                <c:when test="${'RENOVACAO' == PEDIDO.tipo.name()}">
-                                    <div class="form-floating mb-3">
-                                        <label for="justificativaComissasoRenovacao">Requisito(s) não Cumprido(s)</label>
-                                        <p class="form-control" id="justificativaComissasoRenovacao" readonly>${RENOVACAO_ESTAGIO.justificativaDocente}</p>
-                                    </div>
+                            </c:choose>
+                            <c:choose>
+                                <c:when test="${'RENOVACAO' == RENOVACAO_ESTAGIO.tipo.name()}">
+                                    <c:choose>
+                                        <c:when test="${not empty RENOVACAO_ESTAGIO.justificativaDocente}">
+                                            <div class="form-floating mb-3">
+                                                <label for="justificativaComissasoRenovacao">Requisito(s) não Cumprido(s)</label>
+                                                <p class="form-control" id="justificativaComissasoRenovacao" readonly>${RENOVACAO_ESTAGIO.justificativaDocente}</p>
+                                            </div>
+                                        </c:when>
+                                        <c:when test="${Float.parseFloat(RENOVACAO_ESTAGIO.discente.getIra()) < 5}">
+                                            <div class="form-floating mb-3">
+                                                <label for="erroIraRenovacao">Requisito(s) não Cumprido(s)</label>
+                                                <p class="form-control" id="erroIraRenovacao" readonly>Ira Abaixo do Necessário</p>
+                                            </div>
+                                        </c:when>
+                                    </c:choose>
                                 </c:when>
                             </c:choose>
                             <form class="needs-validation" novalidate accept-charset="utf-8" enctype="multipart/form-data" id="discenteForm" name="discenteForm" action="discenteController" method="post">

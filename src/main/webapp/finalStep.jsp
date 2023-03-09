@@ -315,11 +315,19 @@
                                     <label for="tceAntigo">Download do TCE Assinado:</label>
                                     <a id="tceAntigo" href="${TCE_URL}">${TCE.nome}</a>
                                 </div>
+                                <div class="form-floating mb-3">
+                                    <label for="proximosPassos">Proximos Passos:</label>
+                                    <p class="form-control" id="proximosPassos" readonly>Realizar Download do Plano de Atividades Assinado e do TCE Assinado para ser Anexado no Formulario Final da DEST</p>
+                                </div>
                             </c:if>
                             <c:if test="${'RENOVACAO' == RENOVACAO_ESTAGIO.tipo.name()}">
                                 <div class="form-floating mb-3">
                                     <label for="termoAditivoAntigo">Download do Termo Aditivo Assinado:</label>
                                     <a id="termoAditivoAntigo" href="${TERMO_ADITIVO_URL}">${TERMO_ADITIVO.nome}</a>
+                                </div>
+                                <div class="form-floating mb-3">
+                                    <label for="proximosPassosAditivo">Proximos Passos:</label>
+                                    <p class="form-control" id="proximosPassosAditivo" readonly>Realizar Download do Termo Aditivo Assinado para ser Anexado no Formulario Final da DEST</p>
                                 </div>
                             </c:if>
                             <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">

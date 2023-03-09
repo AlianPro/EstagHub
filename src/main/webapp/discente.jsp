@@ -178,9 +178,17 @@
                             </a>
                         </li>
                     </c:when>
-                    <c:when test="${'NOVO_PEDIDO_FIM' == RENOVACAO_ESTAGIO.status.name()}">
+                    <c:when test="${'RENOVACAO_STEP1' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="#">
+                                <i class="fas fa-fw fa-wrench"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:when test="${'NOVO_PEDIDO_FIM' == RENOVACAO_ESTAGIO.status.name()}">
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="finalStep.jsp">
                                 <i class="fas fa-fw fa-wrench"></i>
                                 <span>Renovação de Estágio</span>
                             </a>

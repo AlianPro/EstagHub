@@ -22,7 +22,7 @@
                 type: "POST",
                 url: "docenteController",
                 data: {
-                    buttonLogoutDocenteComissao: $('button[id^=buttonLogoutDocenteComissao]').val()
+                    buttonLogoutDocenteComissao: 'logout'
                 }
             });
         }

@@ -53,6 +53,18 @@
                 }
             });
         }
+        function logoutDocenteComissao(){
+            $.ajax({
+                type: "POST",
+                url: "docenteController",
+                data: {
+                    buttonLogoutDocenteComissao: 'logout'
+                },
+                sucess: function (){
+                    return true;
+                }
+            });
+        }
     </script>
 </head>
 
@@ -265,7 +277,7 @@
             <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                <button id="buttonLogoutDocenteComissao" name="buttonLogoutDocenteComissao" type="submit" value="logout" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</button>
+                <a href="index.jsp" id="buttonLogoutDocenteComissao" type="submit" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</a>
             </div>
         </div>
     </div>

@@ -23,6 +23,9 @@
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 
     <!-- Core plugin JavaScript-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt-BR.min.js" integrity="sha512-mVkLPLQVfOWLRlC2ZJuyX5+0XrTlbW2cyAwyqgPkLGxhoaHNSWesYMlcUjX8X+k45YB8q90s88O7sos86636NQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
 
     <!-- Custom scripts for all pages-->
@@ -42,6 +45,18 @@
                     }, false);
                 });
             }
+            $('#dataInicio').datepicker({
+                format: "dd/mm/yyyy",
+                language: "pt-BR",
+                autoclose: true,
+                todayHighlight: true
+            });
+            $('#dataFim').datepicker({
+                format: "dd/mm/yyyy",
+                language: "pt-BR",
+                autoclose: true,
+                todayHighlight: true
+            });
         });
         function goToNextStep(){
             let formLogin = document.getElementById('discenteForm');
@@ -70,6 +85,30 @@
                     buttonLogoutDiscente: $('button[id^=buttonLogoutDiscente]').val()
                 }
             });
+        }
+        function hideTextAreaTCEPreenchido(){
+            $("#discenteForm").children().prop('disabled',false);
+            $("#discenteForm").prop('hidden',false);
+            $("#modeloTCEUFRRJ").children().prop('disabled',true);
+            $("#modeloTCEUFRRJ").prop('hidden',true);
+            $("#tceAssinado").children().prop('disabled',true);
+            $("#tceAssinado").prop('hidden',true);
+        }
+        function hideTextAreaTCEPreenchidoEmpresa(){
+            $("#discenteForm").children().prop('disabled',true);
+            $("#discenteForm").prop('hidden',true);
+            $("#modeloTCEUFRRJ").children().prop('disabled',true);
+            $("#modeloTCEUFRRJ").prop('hidden',true);
+            $("#tceAssinado").children().prop('disabled',false);
+            $("#tceAssinado").prop('hidden',false);
+        }
+        function hideTextAreaTCEPreenchidoUFRRJ(){
+            $("#discenteForm").children().prop('disabled',true);
+            $("#discenteForm").prop('hidden',true);
+            $("#modeloTCEUFRRJ").children().prop('disabled',false);
+            $("#modeloTCEUFRRJ").prop('hidden',false);
+            $("#tceAssinado").children().prop('disabled',false);
+            $("#tceAssinado").prop('hidden',false);
         }
     </script>
 
@@ -263,21 +302,48 @@
                     <div class="tab-content">
                         <div class="tab-pane" style="display: block">
                             <c:choose>
-                                <c:when test="${'NOVO_STEP4_TCE'== NOVO_ESTAGIO.status.name() || 'NOVO_STEP4_ATIVIDADES_TCE'== NOVO_ESTAGIO.status.name()}">
-                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
+                                <c:when test="${'NOVO_STEP4_TCE'== NOVO_ESTAGIO.status.name()}">
+                                    <div class="form-outline mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceEmpresa" value="empresa" required onclick="hideTextAreaTCEPreenchidoEmpresa()">
+                                            <label class="form-check-label" for="tceEmpresa">Enviar TCE Usando o Modelo da Empresa</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceBranco" value="branco" required onclick="hideTextAreaTCEPreenchidoUFRRJ()">
+                                            <label class="form-check-label" for="tceBranco">Enviar TCE Usando o Modelo da UFRRJ em Branco</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceGerar" value="gerar" required onclick="hideTextAreaTCEPreenchido()">
+                                            <label class="form-check-label" for="tceGerar">Gerar TCE</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-floating mb-3" id="modeloTCEUFRRJ" hidden>
+                                        <label for="tceDiscente">Visualizar o Modelo em Branco do TCE da UFRRJ:</label>
+                                        <a id="tceDiscente" href="${TCE_MODELO_UFRRJ_URL}">${TCE_MODELO_UFRRJ}</a>
+                                    </div>
+                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="tceAssinado" name="discenteForm" action="discenteController" method="post" hidden>
                                         <div class="form-floating mb-3">
-                                            <label for="erroDocumento">Erro(s) Identificado(s) pelo(a) Docente Orientador</label>
-                                            <input class="form-control alert alert-danger" id="erroDocumento" type="text" name="erroDocumento" readonly disabled value="${NOVO_ESTAGIO.justificativaDocumentacao}"/>
+                                            <label for="erroDocumentoPreenchido">Erro(s) Identificado(s) pelo(a) Docente Orientador</label>
+                                            <input class="form-control alert alert-danger" id="erroDocumentoPreenchido" type="text" name="erroDocumento" readonly disabled value="${NOVO_ESTAGIO.justificativaDocumentacao}"/>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <label for="nomeEmpresaTCE">Nome da Empresa</label>
-                                            <input class="form-control" id="nomeEmpresaTCE" type="text" name="nomeEmpresa" required placeholder="Nome da Empresa" value="${DOCUMENTO.tce.getNomeEmpresa()}"/>
+                                            <label for="fileTCEAssinado">Anexe o TCE Preenchido e Assinado:</label>
+                                            <input id="fileTCEAssinado" name="fileTCEAssinado" required type="file" accept=".doc, .docx, .pdf"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
                                             <div class="invalid-feedback">
-                                                Ops! Informe o Nome da Empresa.
+                                                Ops! Anexe o TCE Preenchido e Assinado.
                                             </div>
+                                        </div>
+                                        <div role="toolbar" style="text-align: right">
+                                            <button class="btn btn-primary" type="submit" id="submitButtonDiscenteElaborarTCEPreenchido" name="submitButtonDiscenteElaborarTCE" value="step4">Enviar</button>
+                                        </div>
+                                    </form>
+                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post" hidden>
+                                        <div class="form-floating mb-3">
+                                            <label for="erroDocumento">Erro(s) Identificado(s) pelo(a) Docente Orientador</label>
+                                            <input class="form-control alert alert-danger" id="erroDocumento" type="text" name="erroDocumento" readonly disabled value="${NOVO_ESTAGIO.justificativaDocumentacao}"/>
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="cnpjEmpresaTCE">CNPJ da Empresa</label>
@@ -395,131 +461,154 @@
                                     </form>
                                 </c:when>
                                 <c:otherwise>
-                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
-                                <div class="form-floating mb-3">
-                                    <label for="nomeEmpresa">Nome da Empresa</label>
-                                    <input class="form-control" id="nomeEmpresa" type="text" name="nomeEmpresa" required placeholder="Nome da Empresa"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
+                                    <div class="form-outline mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceEmpresaPrincipal" value="empresa" required onclick="hideTextAreaTCEPreenchidoEmpresa()">
+                                            <label class="form-check-label" for="tceEmpresaPrincipal">Enviar TCE Usando o Modelo da Empresa</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceBrancoPrincipal" value="branco" required onclick="hideTextAreaTCEPreenchidoUFRRJ()">
+                                            <label class="form-check-label" for="tceBrancoPrincipal">Enviar TCE Usando o Modelo da UFRRJ em Branco</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceGerarPrincipal" value="gerar" required onclick="hideTextAreaTCEPreenchido()">
+                                            <label class="form-check-label" for="tceGerarPrincipal">Gerar TCE</label>
+                                        </div>
                                     </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Nome da Empresa.
+                                    <div class="form-floating mb-3" id="modeloTCEUFRRJ" hidden>
+                                        <label for="tceDiscenteDiscentePrincipal">Visualizar o Modelo em Branco do TCE da UFRRJ:</label>
+                                        <a id="tceDiscenteDiscentePrincipal" href="${TCE_MODELO_UFRRJ_URL}">${TCE_MODELO_UFRRJ}</a>
                                     </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="cnpjEmpresa">CNPJ da Empresa</label>
-                                    <input class="form-control" id="cnpjEmpresa" type="text" name="cnpjEmpresa" required placeholder="CNPJ da Empresa"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o CNPJ da Empresa.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="horarioInicio">Horário Início</label>
-                                    <input class="form-control" id="horarioInicio" type="time" name="horarioInicio" required/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Horário de Início.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="horarioFim">Horário Fim</label>
-                                    <input class="form-control" id="horarioFim" type="time" name="horarioFim" required />
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Horário de Fim.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="intervaloEstagio">Intervalo</label>
-                                    <input class="form-control" id="intervaloEstagio" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Intervalo.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="totalHoras">Total Horas</label>
-                                    <input class="form-control" id="totalHoras" type="text" name="totalHoras" required placeholder="Total Horas Semanais"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Total Horas.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="dataInicio">Data Início</label>
-                                    <input class="form-control" id="dataInicio" type="date" name="dataInicio" required/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe a Data de Início.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="dataFim">Data Fim</label>
-                                    <input class="form-control" id="dataFim" type="date" name="dataFim" required/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe a Data de Fim.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="bolsaEstagio">Bolsa</label>
-                                    <input class="form-control" id="bolsaEstagio" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Valor da Bolsa.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="auxilioTransporte">Auxílio Transporte</label>
-                                    <input class="form-control" id="auxilioTransporte" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Valor do Auxílio Transporte.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="codigoApolice">Código Apólice</label>
-                                    <input class="form-control" id="codigoApolice" type="text" name="codigoApolice" required placeholder="Código Apólice do Seguro"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Código Apólice.
-                                    </div>
-                                </div>
-                                <div class="form-floating mb-3">
-                                    <label for="nomeSeguradora">Nome Seguradora</label>
-                                    <input class="form-control" id="nomeSeguradora" type="text" name="nomeSeguradora" required placeholder="Nome da Seguradora"/>
-                                    <div class="valid-feedback">
-                                        Perfeito!
-                                    </div>
-                                    <div class="invalid-feedback">
-                                        Ops! Informe o Nome da Seguradora.
-                                    </div>
-                                </div>
-                                <div role="toolbar" style="text-align: right">
-                                    <button class="btn btn-primary" type="submit" id="submitButtonDiscenteElaborarTCE" name="submitButtonDiscenteElaborarTCE" value="step4">Enviar</button>
-                                </div>
-                            </form>
+                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="tceAssinado" name="discenteForm" action="discenteController" method="post" hidden>
+                                        <div class="form-floating mb-3">
+                                            <label for="fileTCEAssinadoPrincipal">Anexe o TCE Preenchido e Assinado:</label>
+                                            <input id="fileTCEAssinadoPrincipal" name="fileTCEAssinado" required type="file" accept=".doc, .docx, .pdf"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Anexe o TCE Preenchido e Assinado.
+                                            </div>
+                                        </div>
+                                        <div role="toolbar" style="text-align: right">
+                                            <button class="btn btn-primary" type="submit" id="submitButtonDiscenteElaborarTCEPrincipal" name="submitButtonDiscenteElaborarTCE" value="step4">Enviar</button>
+                                        </div>
+                                    </form>
+                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post" hidden>
+                                        <div class="form-floating mb-3">
+                                            <label for="cnpjEmpresa">CNPJ da Empresa</label>
+                                            <input class="form-control" id="cnpjEmpresa" type="text" name="cnpjEmpresa" required placeholder="CNPJ da Empresa"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o CNPJ da Empresa.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="horarioInicio">Horário Início</label>
+                                            <input class="form-control" id="horarioInicio" type="time" name="horarioInicio" required/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Horário de Início.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="horarioFim">Horário Fim</label>
+                                            <input class="form-control" id="horarioFim" type="time" name="horarioFim" required />
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Horário de Fim.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="intervaloEstagio">Intervalo</label>
+                                            <input class="form-control" id="intervaloEstagio" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Intervalo.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="totalHoras">Total Horas</label>
+                                            <input class="form-control" id="totalHoras" type="text" name="totalHoras" required placeholder="Total Horas Semanais"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Total Horas.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="dataInicio">Data Início</label>
+                                            <input class="form-control" id="dataInicio" type="text" name="dataInicio" required/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe a Data de Início.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="dataFim">Data Fim</label>
+                                            <input class="form-control" id="dataFim" type="text" name="dataFim" required/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe a Data de Fim.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="bolsaEstagio">Bolsa</label>
+                                            <input class="form-control" id="bolsaEstagio" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Valor da Bolsa.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="auxilioTransporte">Auxílio Transporte</label>
+                                            <input class="form-control" id="auxilioTransporte" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Valor do Auxílio Transporte.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="codigoApolice">Código Apólice</label>
+                                            <input class="form-control" id="codigoApolice" type="text" name="codigoApolice" required placeholder="Código Apólice do Seguro"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Código Apólice.
+                                            </div>
+                                        </div>
+                                        <div class="form-floating mb-3">
+                                            <label for="nomeSeguradora">Nome Seguradora</label>
+                                            <input class="form-control" id="nomeSeguradora" type="text" name="nomeSeguradora" required placeholder="Nome da Seguradora"/>
+                                            <div class="valid-feedback">
+                                                Perfeito!
+                                            </div>
+                                            <div class="invalid-feedback">
+                                                Ops! Informe o Nome da Seguradora.
+                                            </div>
+                                        </div>
+                                        <div role="toolbar" style="text-align: right">
+                                            <button class="btn btn-primary" type="submit" id="submitButtonDiscenteElaborarTCE" name="submitButtonDiscenteElaborarTCE" value="step4">Enviar</button>
+                                        </div>
+                                    </form>
                                 </c:otherwise>
                             </c:choose>
                         </div>
