@@ -1,5 +1,5 @@
-![GitHub repo size](https://img.shields.io/github/repo-size/AlianPro/AmeDigital-Challenge--API)
-![GitHub language count](https://img.shields.io/github/languages/count/AlianPro/AmeDigital-Challenge--API)
+![GitHub repo size](https://img.shields.io/github/repo-size/AlianPro/EstagHub)
+![GitHub language count](https://img.shields.io/github/languages/count/AlianPro/EstagHub)
 
 <details id="pt">
   <summary>PT/BR:brazil:</summary>
