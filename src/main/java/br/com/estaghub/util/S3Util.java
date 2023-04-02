@@ -11,6 +11,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import org.apache.http.client.methods.HttpRequestBase;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
@@ -73,5 +74,9 @@ public class S3Util {
         }catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    public static String getContextParameter(HttpServletRequest req, String name) {
+        return req.getServletContext().getInitParameter(name);
     }
 }

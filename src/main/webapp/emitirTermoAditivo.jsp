@@ -1,5 +1,3 @@
-<%@ page import="br.com.estaghub.domain.Curso" %>
-<%@ page import="br.com.estaghub.domain.Discente" %>
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -12,6 +10,7 @@
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/x-icon" href="assets/img/rural_logo_branca.png"/>
     <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
@@ -28,6 +27,8 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
         $(document).ready(function (){
             let formLogin = document.getElementById('discenteForm');
@@ -40,6 +41,19 @@
                             event.stopPropagation();
                         }
                         formLogin.classList.add('was-validated');
+                    }, false);
+                });
+            }
+            let formTermoAditivoAssinado = document.getElementById('termoAditivoAssinado');
+            if(formTermoAditivoAssinado) {
+                const forms = document.querySelectorAll('.needs-validation');
+                Array.prototype.slice.call(forms).forEach((formTermoAditivoAssinado) => {
+                    formTermoAditivoAssinado.addEventListener('submit', (event) => {
+                        if (!formTermoAditivoAssinado.checkValidity()) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        formTermoAditivoAssinado.classList.add('was-validated');
                     }, false);
                 });
             }
@@ -74,33 +88,41 @@
                 });
             }
         }
-        function logoutDiscente(){
+        function logout(){
             $.ajax({
                 type: "POST",
-                url: "discenteController",
-                cache: false,
+                url: "principalController",
                 data: {
-                    buttonLogoutDiscente: $('button[id^=buttonLogoutDiscente]').val()
+                    buttonLogout: 'logout'
+                },
+                sucess: function (){
+                    return true;
                 }
             });
         }
         function hideTextAreaTermoAditivoPreenchido(){
+            $("#discenteForm").children().prop('disabled',false);
+            $("#discenteForm").prop('hidden',false);
+            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
+            $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
+            $("#termoAditivoAssinado").children().prop('disabled',true);
+            $("#termoAditivoAssinado").prop('hidden',true);
+        }
+        function hideTextAreaTermoAditivoPreenchidoEmpresa(){
+            $("#discenteForm").children().prop('disabled',true);
+            $("#discenteForm").prop('hidden',true);
             $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
             $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
             $("#termoAditivoAssinado").children().prop('disabled',false);
             $("#termoAditivoAssinado").prop('hidden',false);
         }
-        function hideTextAreaTermoAditivoPreenchidoEmpresa(){
-            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
-            $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
-            $("#termoAditivoAssinado").children().prop('disabled',true);
-            $("#termoAditivoAssinado").prop('hidden',true);
-        }
         function hideTextAreaTermoAditivoPreenchidoUFRRJ(){
+            $("#discenteForm").children().prop('disabled',true);
+            $("#discenteForm").prop('hidden',true);
             $("#modeloTermoAditivoUFRRJ").children().prop('disabled',false);
             $("#modeloTermoAditivoUFRRJ").prop('hidden',false);
-            $("#termoAditivoAssinado").children().prop('disabled',true);
-            $("#termoAditivoAssinado").prop('hidden',true);
+            $("#termoAditivoAssinado").children().prop('disabled',false);
+            $("#termoAditivoAssinado").prop('hidden',false);
         }
     </script>
 
@@ -117,7 +139,7 @@
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="discente.jsp">
             <div class="sidebar-brand-icon rotate-n-15">
-                <i class="fas fa-laugh-wink"></i>
+                <img class="img-fluid" src="assets/img/rural_logo_branca.png"/>
             </div>
             <div class="sidebar-brand-text mx-3">EstagHub</div>
         </a>
@@ -140,7 +162,7 @@
                     <c:when test="${'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -148,7 +170,7 @@
                     <c:when test="${'RENOVACAO_STEP3_REJEITADO' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -156,7 +178,15 @@
                     <c:when test="${'RENOVACAO_STEP4' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="emitirTermoAditivo.jsp">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:when test="${'RENOVACAO_STEP4_DISCENTE_ASSINADO' == RENOVACAO_ESTAGIO.status.name()}">
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -164,7 +194,7 @@
                     <c:when test="${'NOVO_PEDIDO_FIM' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -172,7 +202,7 @@
                     <c:otherwise>
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="renovacaoEstagio.jsp">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -180,14 +210,6 @@
                 </c:choose>
             </c:when>
         </c:choose>
-        <c:if test="${'RENOVACAO_STEP4_DISCENTE_ASSINADO' == RENOVACAO_ESTAGIO.status.name()}">
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Assinar Documentos</span>
-                </a>
-            </li>
-        </c:if>
 
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
@@ -228,11 +250,8 @@
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
+
+
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -288,7 +307,7 @@
                                     <button class="btn btn-primary" type="submit" id="submitButtonDiscenteTermoAditivoAnexo" name="submitButtonDiscenteTermoAditivo" value="termoAditivo">Enviar</button>
                                 </div>
                             </form>
-                            <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
+                            <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post" hidden>
                                 <div class="form-floating mb-3">
                                     <label for="dataInicioAditivo">Data Antiga para Fim de Estágio</label>
                                     <input class="form-control" id="dataInicioAditivo" type="text" name="dataInicioAditivo" required placeholder="dd/mm/yyyy"/>
@@ -357,7 +376,7 @@
 
     </div>
     <!-- End of Page Wrapper -->
-
+</div>
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
         <i class="fas fa-angle-up"></i>
@@ -377,12 +396,11 @@
                 <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
                 <div class="modal-footer">
                     <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                    <button id="buttonLogoutDiscente" name="buttonLogoutDiscente" type="submit" value="logout" class="btn btn-primary" onclick="logoutDiscente()">Logout</button>
+                    <a href="index.jsp" id="buttonLogout" type="submit" class="btn btn-primary" onclick="logout()">Logout</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
 </body>
 

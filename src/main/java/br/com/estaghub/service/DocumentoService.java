@@ -2,7 +2,6 @@ package br.com.estaghub.service;
 
 import br.com.estaghub.domain.Discente;
 import br.com.estaghub.domain.Documento;
-import br.com.estaghub.domain.Empresa;
 import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.dto.PlanoAtividadesCreationDTO;
 import br.com.estaghub.dto.TCECreationDTO;
@@ -20,9 +19,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public class DocumentoService {
     public static String PLANO_ATIVIDADE = "/home/alianpro/Documents/Projetos/estaghub/src/main/java/br/com/estaghub/docs/PLANO-DE-ATIVIDADES-DE-ESTÁGIO.doc";
@@ -70,18 +69,18 @@ public class DocumentoService {
         }
         return "";
     }
-    public void gerarPlanoAtividades(String idDiscente, TipoDocumento tipoDocumento, List<String> atividades, PlanoAtividadesCreationDTO planoAtividadesCreationDTO, Discente discente, Pedido pedido){
+    public void gerarPlanoAtividades(String idDiscente, TipoDocumento tipoDocumento, List<Optional<String>> atividades, PlanoAtividadesCreationDTO planoAtividadesCreationDTO, Discente discente, Pedido pedido){
         try{
             DocumentoService instance = new DocumentoService();
             DecimalFormat dmFormat = new DecimalFormat("00");
             if (tipoDocumento == TipoDocumento.PLANO_ATIVIDADES){
                 HWPFDocument doc = instance.openDocument(PLANO_ATIVIDADE);
                 if (doc != null) {
-                    doc = instance.replaceText(doc, "{primeiraAtividade}", atividades.get(0));
-                    doc = instance.replaceText(doc, "{segundaAtividade}", atividades.get(1));
-                    doc = instance.replaceText(doc, "{terceiraAtividade}", atividades.get(2));
-                    doc = instance.replaceText(doc, "{quartaAtividade}", atividades.get(3));
-                    doc = instance.replaceText(doc, "{quintaAtividade}", atividades.get(4));
+                    doc = instance.replaceText(doc, "{primeiraAtividade}", atividades.get(0).isPresent()? atividades.get(0).get() : "");
+                    doc = instance.replaceText(doc, "{segundaAtividade}", atividades.get(1).isPresent()? atividades.get(1).get() : "");
+                    doc = instance.replaceText(doc, "{terceiraAtividade}", atividades.get(2).isPresent()? atividades.get(2).get() : "");
+                    doc = instance.replaceText(doc, "{quartaAtividade}", atividades.get(3).isPresent()? atividades.get(3).get() : "");
+                    doc = instance.replaceText(doc, "{quintaAtividade}", atividades.get(4).isPresent()? atividades.get(4).get() : "");
                     doc = instance.replaceText(doc, "{nomeDiscente}", discente.getNome());
                     doc = instance.replaceText(doc, "{matriculaDiscente}", discente.getMatricula());
                     doc = instance.replaceText(doc, "{cursoDiscente}", discente.getCurso().getNome());
@@ -128,12 +127,12 @@ public class DocumentoService {
                     doc = instance.replaceText(doc, "{horarioFim}", tceCreationDTO.getHorarioFim());
                     doc = instance.replaceText(doc, "{intervalo}", tceCreationDTO.getIntervalo());
                     doc = instance.replaceText(doc, "{totalHoras}", tceCreationDTO.getTotalHoras());
-                    doc = instance.replaceText(doc, "{diaInicio}", tceCreationDTO.getDataInicio().substring(8,10));
-                    doc = instance.replaceText(doc, "{mesInicio}", tceCreationDTO.getDataInicio().substring(5,7));
-                    doc = instance.replaceText(doc, "{anoInicio}", tceCreationDTO.getDataInicio().substring(0,4));
-                    doc = instance.replaceText(doc, "{diaFim}", tceCreationDTO.getDataFim().substring(8,10));
-                    doc = instance.replaceText(doc, "{mesFim}", tceCreationDTO.getDataFim().substring(5,7));
-                    doc = instance.replaceText(doc, "{anoFim}", tceCreationDTO.getDataFim().substring(0,4));
+                    doc = instance.replaceText(doc, "{diaInicio}", tceCreationDTO.getDataInicio().substring(0,2));
+                    doc = instance.replaceText(doc, "{mesInicio}", tceCreationDTO.getDataInicio().substring(3,5));
+                    doc = instance.replaceText(doc, "{anoInicio}", tceCreationDTO.getDataInicio().substring(6,10));
+                    doc = instance.replaceText(doc, "{diaFim}", tceCreationDTO.getDataFim().substring(0,2));
+                    doc = instance.replaceText(doc, "{mesFim}", tceCreationDTO.getDataFim().substring(3,5));
+                    doc = instance.replaceText(doc, "{anoFim}", tceCreationDTO.getDataFim().substring(6,10));
                     doc = instance.replaceText(doc, "{bolsa}", tceCreationDTO.getBolsa());
                     doc = instance.replaceText(doc, "{auxTransporte}", tceCreationDTO.getAuxTransporte());
                     doc = instance.replaceText(doc, "{codApolice}", tceCreationDTO.getCodApolice());

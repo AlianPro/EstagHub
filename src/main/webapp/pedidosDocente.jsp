@@ -10,12 +10,15 @@
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/x-icon" href="assets/img/rural_logo_branca.png"/>
     <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.css" rel="stylesheet">
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
         function sendNextPage(idPedido, statusPedido){
             $.ajax({
@@ -27,38 +30,22 @@
                     statusPedido: statusPedido
                 },
                 success: function (){
-                    if(${'NOVO_STEP1' == PEDIDO.status.name()}){
-                        window.location.replace("novoStep2.jsp");
-                    }else if(${'NOVO_STEP2' == PEDIDO.status.name()}){
-                        alert("Pedido em andamento!");
-                    }else if(${'NOVO_STEP2_REJEITADO' == PEDIDO.status.name()}){
-                        alert("Aguardando a Justificativa do(a) Discente");
-                    }else if(${'NOVO_STEP2_JUSTIFICADO' == PEDIDO.status.name()}){
-                        window.location.replace("novoStep2Justificado.jsp");
-                    }else if(${'NOVO_STEP3' == PEDIDO.status.name()}){
-                        alert("Pedido em andamento!");
-                    }else if(${'NOVO_STEP4' == PEDIDO.status.name()}){
+                    if('NOVO_STEP4' === statusPedido){
                         window.location.replace("novoStep4.jsp");
-                    }else if(${'NOVO_STEP4_PLANO_ATIVIDADES' == PEDIDO.status.name()}){
-                        alert("Pedido em andamento!");
-                    }else if(${'NOVO_STEP4_TCE' == PEDIDO.status.name()}){
-                        alert("Pedido em andamento!");
-                    }else if(${'NOVO_STEP4_ATIVIDADES_TCE' == PEDIDO.status.name()}){
-                        alert("Pedido em andamento!");
-                    }else if(${'NOVO_STEP4_DOCENTE_ASSINADO' == PEDIDO.status.name()}){
+                    }else if('NOVO_STEP4_DOCENTE_ASSINADO' === statusPedido){
                         window.location.replace("assinarDocumentoDocente.jsp");
-                    }else if(${'RENOVACAO_STEP3' == PEDIDO.status.name()}){
+                    }else if('RENOVACAO_STEP3' === statusPedido){
                         window.location.replace("renovacaoStep3.jsp");
                     }
                 }
             });
         }
-        function logoutDocenteComissao(){
+        function logout(){
             $.ajax({
                 type: "POST",
-                url: "docenteController",
+                url: "principalController",
                 data: {
-                    buttonLogoutDocenteComissao: 'logout'
+                    buttonLogout: 'logout'
                 },
                 sucess: function (){
                     return true;
@@ -79,7 +66,7 @@
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="docente.jsp">
             <div class="sidebar-brand-icon rotate-n-15">
-                <i class="fas fa-laugh-wink"></i>
+                <img class="img-fluid" src="assets/img/rural_logo_branca.png"/>
             </div>
             <div class="sidebar-brand-text mx-3">EstagHub</div>
         </a>
@@ -98,7 +85,7 @@
         <!-- Nav Item - Pedidos Collapse Menu -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="pedidosDocente.jsp">
-                <i class="fas fa-fw fa-cog"></i>
+                <i class="fas fa-fw bi bi-stack"></i>
                 <span>Pedidos</span>
             </a>
         </li>
@@ -142,11 +129,8 @@
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
+
+
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -175,46 +159,30 @@
                                 <c:forEach var="pedido" items="${LIST_PEDIDOS}" varStatus="i">
                                     <c:choose>
                                         <c:when test="${'NOVO' == pedido.tipo.name()}">
-                                            <div class="col">
-                                                <div class="card" style="text-align: center">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">Novo Pedido Estágio - ${pedido.id}</h5>
-                                                        <p class="card-text">${pedido.discente.getNome()}</p>
-                                                        <c:choose>
-                                                            <c:when test="${'NOVO_STEP1' == pedido.status.name()}">
+                                            <c:choose>
+                                                <c:when test="${'NOVO_STEP4' == pedido.status.name()}">
+                                                    <div class="col">
+                                                        <div class="card" style="text-align: center">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">Novo Pedido Estágio - ${pedido.id}</h5>
+                                                                <p class="card-text">${pedido.discente.getNome()}</p>
                                                                 <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP2_REJEITADO' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP2_JUSTIFICADO' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP2' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP3' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP4' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP4_TCE' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                            <c:when test="${'NOVO_STEP4_DOCENTE_ASSINADO' == pedido.status.name()}">
-                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                            </c:when>
-                                                        </c:choose>
+                                                            </div>
+                                                        </div>
                                                     </div>
-                                                </div>
-                                            </div>
+                                                </c:when>
+                                                <c:when test="${'NOVO_STEP4_DOCENTE_ASSINADO' == pedido.status.name()}">
+                                                    <div class="col">
+                                                        <div class="card" style="text-align: center">
+                                                            <div class="card-body">
+                                                                <h5 class="card-title">Novo Pedido Estágio - ${pedido.id}</h5>
+                                                                <p class="card-text">${pedido.discente.getNome()}</p>
+                                                                <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </c:when>
+                                            </c:choose>
                                         </c:when>
                                         <c:when test="${'RENOVACAO' == pedido.tipo.name()}">
                                             <c:choose>
@@ -277,7 +245,7 @@
             <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                <a href="index.jsp" id="buttonLogoutDocenteComissao" type="submit" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</a>
+                <a href="index.jsp" id="buttonLogout" type="submit" class="btn btn-primary" onclick="logout()">Logout</a>
             </div>
         </div>
     </div>

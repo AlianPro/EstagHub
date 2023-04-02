@@ -10,6 +10,7 @@
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/x-icon" href="assets/img/rural_logo_branca.png"/>
     <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
@@ -24,6 +25,8 @@
 
     <!-- Custom scripts for all pages-->
     <script src="js/sb-admin-2.min.js"></script>
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
         $(document).ready(function (){
             let formLogin = document.getElementById('discenteForm');
@@ -67,12 +70,13 @@
                 }
             });
         }
-        function download(){
+        function logout(){
             $.ajax({
                 type: "POST",
-                url: "docenteController",
+                url: "principalController",
+                cache: false,
                 data: {
-                    buttonBaixar: 'baixar'
+                    buttonLogout: $('button[id^=buttonLogout]').val()
                 }
             });
         }
@@ -90,7 +94,7 @@
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="discente.jsp">
             <div class="sidebar-brand-icon rotate-n-15">
-                <i class="fas fa-laugh-wink"></i>
+                <img class="img-fluid" src="assets/img/rural_logo_branca.png"/>
             </div>
             <div class="sidebar-brand-text mx-3">EstagHub</div>
         </a>
@@ -112,71 +116,77 @@
                 <c:when test="${RENOVACAO_ESTAGIO == null}">
                     <c:choose>
                         <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name()}">
-                            <%--                    TODO tela para avisar q está esperando resposta do docente--%>
+                            <%--TODO tela para avisar q está esperando resposta do docente--%>
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP2' == NOVO_ESTAGIO.status.name()}">
                             <%--TODO tela para avisar q está esperando resposta do docente--%>
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP2_REJEITADO' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name()}">
                             <%--TODO tela para avisar q está esperando resposta do docente--%>
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP3' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
+                                <span>Novo Estágio</span>
+                            </a>
+                        </c:when>
+                        <c:when test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP4' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP4_TCE' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_PEDIDO_FIM' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:otherwise>
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="novoEstagio.jsp">
-                                <i class="fas fa-fw fa-cog"></i>
+                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:otherwise>
@@ -190,7 +200,7 @@
                     <c:when test="${'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -198,7 +208,7 @@
                     <c:when test="${'RENOVACAO_STEP3_REJEITADO' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -206,7 +216,15 @@
                     <c:when test="${'RENOVACAO_STEP4' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="emitirTermoAditivo.jsp">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
+                                <span>Renovação de Estágio</span>
+                            </a>
+                        </li>
+                    </c:when>
+                    <c:when test="${'RENOVACAO_STEP4_DISCENTE_ASSINADO' == RENOVACAO_ESTAGIO.status.name()}">
+                        <li class="nav-item">
+                            <a class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -214,7 +232,7 @@
                     <c:when test="${'NOVO_PEDIDO_FIM' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -222,7 +240,7 @@
                     <c:otherwise>
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="renovacaoEstagio.jsp">
-                                <i class="fas fa-fw fa-wrench"></i>
+                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
                         </li>
@@ -230,14 +248,6 @@
                 </c:choose>
             </c:when>
         </c:choose>
-        <c:if test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name() || 'RENOVACAO_STEP4_DISCENTE_ASSINADO' == RENOVACAO_ESTAGIO.status.name()}">
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
-                    <i class="fas fa-fw fa-wrench"></i>
-                    <span>Assinar Documentos</span>
-                </a>
-            </li>
-        </c:if>
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
 
@@ -277,11 +287,8 @@
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
+
+
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -341,7 +348,7 @@
                                 </c:if>
                                 <c:if test="${'TCE' == TCE.tipoDocumento.name()}">
                                     <div class="form-floating mb-3">
-                                        <label for="tceAssinado">Anexe o TCE UFRRJ ou Modelo da Empresa Assinado:</label>
+                                        <label for="tceAssinado">Anexe o TCE Assinado:</label>
                                         <input id="tceAssinado" name="tceAssinado" required type="file" accept=".doc"/>
                                         <div class="valid-feedback">
                                             Perfeito!
@@ -353,7 +360,7 @@
                                 </c:if>
                                 <c:if test="${'RENOVACAO' == RENOVACAO_ESTAGIO.tipo.name()}">
                                     <div class="form-floating mb-3">
-                                        <label for="termoAditivoAssinado">Anexe o Termo Aditivo UFRRJ ou Modelo da Empresa Assinado:</label>
+                                        <label for="termoAditivoAssinado">Anexe o Termo Aditivo Assinado:</label>
                                         <input id="termoAditivoAssinado" name="termoAditivoAssinado" required type="file" accept=".doc"/>
                                         <div class="valid-feedback">
                                             Perfeito!
@@ -407,7 +414,7 @@
             <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                <button id="buttonLogoutDocenteComissao" name="buttonLogoutDocenteComissao" type="submit" value="logout" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</button>
+                <a href="index.jsp" id="buttonLogout" type="submit" class="btn btn-primary" onclick="logout()">Logout</a>
             </div>
         </div>
     </div>

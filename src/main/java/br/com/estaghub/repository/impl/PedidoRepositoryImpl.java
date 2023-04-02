@@ -8,13 +8,11 @@ import br.com.estaghub.enums.StatusPedido;
 import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.repository.PedidoRepository;
 import br.com.estaghub.util.HibernateUtil;
-import net.bytebuddy.agent.builder.AgentBuilder;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 

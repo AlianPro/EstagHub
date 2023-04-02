@@ -10,19 +10,25 @@
 
     <!-- Custom fonts for this template-->
     <link href="vendor/fontawesome-free/css/all.min.css" rel="stylesheet" type="text/css">
+    <link rel="icon" type="image/x-icon" href="assets/img/rural_logo_branca.png"/>
     <link
             href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
             rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="css/sb-admin-2.css" rel="stylesheet">
+    <!-- Bootstrap icons-->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
-        function logoutDocenteComissao(){
+        function logout(){
             $.ajax({
                 type: "POST",
-                url: "docenteController",
+                url: "principalController",
                 data: {
-                    buttonLogoutDocenteComissao: 'logout'
+                    buttonLogout: 'logout'
+                },
+                sucess: function (){
+                    return true;
                 }
             });
         }
@@ -40,7 +46,7 @@
         <!-- Sidebar - Brand -->
         <a class="sidebar-brand d-flex align-items-center justify-content-center" href="docenteComissao.jsp">
             <div class="sidebar-brand-icon rotate-n-15">
-                <i class="fas fa-laugh-wink"></i>
+                <img class="img-fluid" src="assets/img/rural_logo_branca.png"/>
             </div>
             <div class="sidebar-brand-text mx-3">EstagHub</div>
         </a>
@@ -59,7 +65,7 @@
         <!-- Nav Item - Pedidos Collapse Menu -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="pedidosDocenteComissao.jsp">
-                <i class="fas fa-fw fa-cog"></i>
+                <i class="fas fa-fw bi bi-stack"></i>
                 <span>Pedidos</span>
             </a>
         </li>
@@ -67,7 +73,7 @@
         <!-- Nav Item - Criar Docente Collapse Menu -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="criarDocente.jsp">
-                <i class="fas fa-fw fa-wrench"></i>
+                <i class="fas fa-fw bi bi-person-fill-add"></i>
                 <span>Criar Docente</span>
             </a>
         </li>
@@ -75,14 +81,14 @@
         <!-- Nav Item - Criar Curso Collapse Menu -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="criarCurso.jsp">
-                <i class="fas fa-fw fa-wrench"></i>
+                <i class="fas fa-fw bi bi-mortarboard-fill"></i>
                 <span>Criar Curso</span>
             </a>
         </li>
         <!-- Nav Item - Criar Departamento Collapse Menu -->
         <li class="nav-item">
             <a class="nav-link collapsed" href="criarDepartamento.jsp">
-                <i class="fas fa-fw fa-wrench"></i>
+                <i class="fas fa-fw bi bi-building-fill-add"></i>
                 <span>Criar Departamento</span>
             </a>
         </li>
@@ -125,11 +131,6 @@
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-                            <a class="dropdown-item" href="#">
-                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                Profile
-                            </a>
-                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -146,7 +147,7 @@
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <h1 class="h3 mb-4 text-gray-800">Blank Page</h1>
+                <img class="img-fluid" src="assets/img/undraw_Content_structure_re_ebkv.png" alt="..." style="width: 100%; height: 100%;"/>
 
             </div>
             <!-- /.container-fluid -->
@@ -189,7 +190,7 @@
             <div class="modal-body">Selecione "Logout" abaixo se você está pronto para terminar essa sessão.</div>
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
-                <button id="buttonLogoutDocenteComissao" name="buttonLogoutDocenteComissao" type="submit" value="logout" class="btn btn-primary" onclick="logoutDocenteComissao()">Logout</button>
+                <a href="index.jsp" id="buttonLogout" type="submit" class="btn btn-primary" onclick="logout()">Logout</a>
             </div>
         </div>
     </div>

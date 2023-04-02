@@ -50,16 +50,16 @@ public class DocumentoRepositoryImpl implements DocumentoRepository {
         query.setParameter("email_empresa_plano_atividades", planoAtividades.getEmailEmpresa());
         query.setParameter("endereco_empresa_plano_atividades", planoAtividades.getEnderecoEmpresa());
         query.setParameter("nome_supervisor_plano_atividades", planoAtividades.getNomeSupervisor());
-        query.setParameter("primeira_atividade_plano_atividades", planoAtividades.getPrimeiraAtividade());
-        query.setParameter("quarta_atividade_plano_atividades", planoAtividades.getQuartaAtividade());
-        query.setParameter("quinta_atividade_plano_atividades", planoAtividades.getQuintaAtividade());
         query.setParameter("responsavel_empresa_plano_atividades", planoAtividades.getResponsavelEmpresa());
-        query.setParameter("segunda_atividade_plano_atividades", planoAtividades.getSegundaAtividade());
         query.setParameter("telefone_empresa_plano_atividades", planoAtividades.getTelefoneEmpresa());
-        query.setParameter("terceira_atividade_plano_atividades", planoAtividades.getTerceiraAtividade());
         query.setParameter("nome_empresa_plano_atividades", planoAtividades.getNomeEmpresa());
         query.setParameter("formacao_supervisor_plano_atividades", planoAtividades.getFormacaoSupervisor());
         query.setParameter("data_hora_ult_atualizacao", LocalDateTime.now());
+        query.setParameter("primeira_atividade_plano_atividades", planoAtividades.getPrimeiraAtividade());
+        query.setParameter("segunda_atividade_plano_atividades", planoAtividades.getSegundaAtividade());
+        query.setParameter("terceira_atividade_plano_atividades", planoAtividades.getTerceiraAtividade());
+        query.setParameter("quarta_atividade_plano_atividades", planoAtividades.getQuartaAtividade());
+        query.setParameter("quinta_atividade_plano_atividades", planoAtividades.getQuintaAtividade());
         query.setParameter("idDocumento", Long.parseLong(idDocumento));
         em.getTransaction().begin();
         query.executeUpdate();
@@ -68,7 +68,7 @@ public class DocumentoRepositoryImpl implements DocumentoRepository {
     }
     @Override
     public void addTCEInDocumento(String idDocumento, TCE tce) {
-        Query query = em.createQuery("UPDATE Documento set nome_empresa_tce = :nome_empresa_tce, cnpj_empresa_tce = :cnpj_empresa_tce, horario_inicio_tce = :horario_inicio_tce, horario_fim_tce = :horario_fim_tce, total_horas_tce = :total_horas_tce , intervalo_tce = :intervalo_tce , data_inicio_tce = :data_inicio_tce , data_fim_tce = :data_fim_tce , bolsa_tce = :bolsa_tce , aux_transporte_tce = :aux_transporte_tce , cod_apolice_tce = :cod_apolice_tce , nome_seguradora_tce = :nome_seguradora_tce , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :idDocumento");
+        Query query = em.createQuery("UPDATE Documento set cnpj_empresa_tce = :cnpj_empresa_tce, horario_inicio_tce = :horario_inicio_tce, horario_fim_tce = :horario_fim_tce, total_horas_tce = :total_horas_tce , intervalo_tce = :intervalo_tce , data_inicio_tce = :data_inicio_tce , data_fim_tce = :data_fim_tce , bolsa_tce = :bolsa_tce , aux_transporte_tce = :aux_transporte_tce , cod_apolice_tce = :cod_apolice_tce , nome_seguradora_tce = :nome_seguradora_tce , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :idDocumento");
         query.setParameter("cnpj_empresa_tce", tce.getCnpjEmpresa());
         query.setParameter("horario_inicio_tce", tce.getHorarioInicio());
         query.setParameter("horario_fim_tce", tce.getHorarioFim());
