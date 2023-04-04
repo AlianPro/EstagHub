@@ -345,7 +345,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="telefoneEmpresa">Telefone da Empresa</label>
-                                            <input class="form-control" id="telefoneEmpresa" type="text" name="telefoneEmpresa" required placeholder="(00) 00000-0000"/>
+                                            <input class="form-control" id="telefoneEmpresa" type="text" name="telefoneEmpresa" required placeholder="(00) 00000-0000" pattern="^\+?[0-9\s()-]{10,}$"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>

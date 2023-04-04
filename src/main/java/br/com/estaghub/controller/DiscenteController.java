@@ -169,10 +169,6 @@ public class DiscenteController extends HttpServlet {
     }
 
     private static void assinarDocumento(HttpServletRequest req, HttpSession session, Pedido pedido, Discente discente, Documento documento, String nomeDocumento, TipoDocumento tipoDocumento, TipoPedido tipoPedido) throws IOException, ServletException {
-        if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),tipoDocumento).isPresent()){
-            S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"), documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), tipoDocumento).get().getNome());
-            documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),tipoDocumento);
-        }
         FileUtil.armazenarDocumentoAssinadoDiscente(discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), req.getParts().stream().filter(part -> nomeDocumento.equals(part.getName())).findFirst().get(),tipoPedido);
         FileUtil.criarDocumento(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())), tipoPedido, tipoDocumento, req.getParts().stream().filter(part -> nomeDocumento.equals(part.getName())).findFirst());
         S3Util.uploadFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"), documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), tipoDocumento).get().getNome());
@@ -241,6 +237,7 @@ public class DiscenteController extends HttpServlet {
         }else if ("NOVO_STEP4_TCE".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getStatus().name())){
             if (req.getParts().stream().anyMatch(part -> "fileTCEAssinado".equals(part.getName()))){
                 if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE).isPresent()){
+                    FileUtil.deleteFile(documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
                     S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
                     documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE);
                 }
@@ -252,8 +249,8 @@ public class DiscenteController extends HttpServlet {
                 req.getRequestDispatcher(SUCESS_DISCENTE).forward(req, resp);
             }else{
                 if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE).isPresent()){
+                    FileUtil.deleteFile(documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome());
                     S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getNome());
-                    documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE);
                 }
                 Long idDocumento = documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE).get().getId();
                 documentoService.gerarTCE(session.getAttribute("ID_DISCENTE").toString(), TipoDocumento.TCE, tceCreationDTO, discente.getDiscenteById(Long.parseLong(session.getAttribute("ID_DISCENTE").toString())));
@@ -328,8 +325,8 @@ public class DiscenteController extends HttpServlet {
 
     private static void deletarDocumento(HttpServletRequest req, HttpSession session, Documento documento, TipoDocumento tipoDocumento) {
         if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),tipoDocumento).isPresent()) {
+            FileUtil.deleteFile(documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), tipoDocumento).get().getNome());
             S3Util.deleteFileS3(S3Util.getContextParameter(req, "access-key"), S3Util.getContextParameter(req, "secret-key"), S3Util.getContextParameter(req, "estaghub-bucket"), documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), tipoDocumento).get().getNome());
-            documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), tipoDocumento);
         }
     }
 

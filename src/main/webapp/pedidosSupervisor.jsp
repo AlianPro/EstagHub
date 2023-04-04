@@ -157,7 +157,7 @@
                                             <div class="col">
                                                 <div class="card" style="text-align: center">
                                                     <div class="card-body">
-                                                        <h5 class="card-title">Renovação Estágio - ${pedido.id}</h5>
+                                                        <h5 class="card-title">Renovação de Estágio - ${pedido.id}</h5>
                                                         <p class="card-text">${pedido.discente.getNome()}</p>
                                                         <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
                                                     </div>

@@ -314,7 +314,7 @@
                             <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
                                 <div class="form-floating mb-3">
                                     <label for="cpfDiscente">CPF</label>
-                                    <input class="form-control" id="cpfDiscente" type="text" name="cpfDiscente" required placeholder="000.000.000-00"/>
+                                    <input class="form-control" id="cpfDiscente" type="text" name="cpfDiscente" required placeholder="000.000.000-00" pattern="(\d{3}\.?\d{3}\.?\d{3}-?\d{2})"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>

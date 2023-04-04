@@ -25,7 +25,6 @@ import java.io.IOException;
 @MultipartConfig(fileSizeThreshold=1024*1024*10,  	// 10 MB
 location = "/home/alianpro/Documents/Projetos/estaghub/src/main/java/br/com/estaghub/docs/pedidos")
 public class DocenteController extends HttpServlet {
-    private static final String SUCESS_DOCENTE = "/docente.jsp";
     private static final String SUCESS_DOCENTE_COMISSAO = "/docenteComissao.jsp";
     private static final String LOGOUT = "/index.jsp";
     private static final String PEDIDOS_COMISSAO = "/pedidosDocenteComissao.jsp";
@@ -127,9 +126,6 @@ public class DocenteController extends HttpServlet {
 
     private static void assinarDocumento(HttpServletRequest req, HttpSession session, Pedido pedido, Docente docente, Documento documento, String nomeDocumento, TipoDocumento tipoDocumento) throws IOException, ServletException {
         FileUtil.armazenarDocumentoAssinadoDocente(docente.getDocenteByEmail(session.getAttribute("EMAIL_DOCENTE").toString()).get(), req.getParts().stream().filter(part -> nomeDocumento.equals(part.getName())).findFirst().get());
-        if (documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),tipoDocumento).isPresent()){
-            documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),tipoDocumento);
-        }
         FileUtil.criarDocumentoDocente(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())), docente.getDocenteByEmail(session.getAttribute("EMAIL_DOCENTE").toString()).get(), tipoDocumento, req.getParts().stream().filter(part -> nomeDocumento.equals(part.getName())).findFirst());
         S3Util.uploadFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"), documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), tipoDocumento).get().getNome());
     }
@@ -147,14 +143,22 @@ public class DocenteController extends HttpServlet {
             String corrigir = req.getParameter("radioCorrigir");
             if ("planoAtividades".equals(corrigir)){
                 pedido.changeStatusPedido(idPedido.toString(),StatusPedido.NOVO_STEP4_PLANO_ATIVIDADES);
-                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome());
+                FileUtil.deleteFile(documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome());
+                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome());
+                documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE);
             }else if ("tce".equals(corrigir)) {
                 pedido.changeStatusPedido(idPedido.toString(),StatusPedido.NOVO_STEP4_TCE);
-                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                FileUtil.deleteFile(documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE);
             }else if ("planoAtividadesTCE".equals(corrigir)) {
                 pedido.changeStatusPedido(idPedido.toString(),StatusPedido.NOVO_STEP4_ATIVIDADES_TCE);
-                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome());
-                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                FileUtil.deleteFile(documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome());
+                FileUtil.deleteFile(documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE).get().getNome());
+                S3Util.deleteFileS3(S3Util.getContextParameter(req,"access-key"),S3Util.getContextParameter(req,"secret-key"),S3Util.getContextParameter(req,"estaghub-bucket"),documento.getDocumentoByIdPedidoAndTipoDocumento(Long.parseLong(idPedido.toString()), TipoDocumento.TCE_ASSINADO_DISCENTE).get().getNome());
+                documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.PLANO_ATIVIDADES_ASSINADO_DISCENTE);
+                documento.removeDocumento(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()),TipoDocumento.TCE_ASSINADO_DISCENTE);
             }
             pedido.changeJustificativaDocumentacaoPedido(idPedido.toString(),justificativa);
             session.setAttribute("LIST_PEDIDOS",pedido.getAllPedidosOfDocente(docente.getDocenteByEmail(emailDocente.toString()).get()));

@@ -126,7 +126,7 @@
             <div class="container-fluid">
 
                 <!-- Page Heading -->
-                <img class="img-fluid" src="https://estaghub.s3.sa-east-1.amazonaws.com/undraw_Teaching_re_g7e3.png" alt="..." style="width: 100%; height: 100%; border-radius: 1%;"/>
+                <img class="img-fluid" src="assets/img/undraw_Teaching_re_g7e3.png" alt="..." style="width: 100%; height: 100%; border-radius: 1%;"/>
 
             </div>
             <!-- /.container-fluid -->

@@ -8,10 +8,9 @@ import br.com.estaghub.enums.TipoDocumento;
 import br.com.estaghub.enums.TipoPedido;
 
 import javax.servlet.http.Part;
-import java.io.*;
+import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.Base64;
+import java.nio.file.Path;
 import java.util.Collection;
 import java.util.Optional;
 
@@ -123,5 +122,13 @@ public class FileUtil {
             documento.setNome((FileUtil.createNomeArquivoEstagio(String.valueOf(discente.getId()), tipoDocumento)));
             documento.criarDocumento(documento);
         });
+    }
+    public static void deleteFile(String name){
+        String path = "/home/alianpro/Documents/Projetos/estaghub/src/main/java/br/com/estaghub/docs/pedidos/"+name;
+        try{
+            Files.delete(Path.of(path));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 }

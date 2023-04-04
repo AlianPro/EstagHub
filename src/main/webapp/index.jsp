@@ -432,7 +432,7 @@
                                             </div>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input class="form-control" id="telefoneDiscente" type="tel" name="telefoneDiscente" required placeholder="(00) 00000-0000"/>
+                                            <input class="form-control" id="telefoneDiscente" type="tel" name="telefoneDiscente" required placeholder="(00) 00000-0000" pattern="^\+?[0-9\s()-]{10,}$"/>
                                             <label for="telefoneDiscente">Telefone</label>
                                             <div class="valid-feedback">
                                                 Perfeito!
@@ -531,7 +531,7 @@
                                             </div>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input class="form-control" id="telefoneSupervisor" type="tel" required name="telefoneSupervisor" placeholder="(00) 00000-0000"/>
+                                            <input class="form-control" id="telefoneSupervisor" type="tel" required name="telefoneSupervisor" placeholder="(00) 00000-0000" pattern="^\+?[0-9\s()-]{10,}$"/>
                                             <label for="telefoneSupervisor">Telefone</label>
                                             <div class="valid-feedback">
                                                 Perfeito!
@@ -626,7 +626,7 @@
                                             </div>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <input class="form-control" id="telefoneEmpresa" type="tel" required name="telefoneEmpresa" placeholder="(00) 00000-0000"/>
+                                            <input class="form-control" id="telefoneEmpresa" type="tel" required name="telefoneEmpresa" placeholder="(00) 00000-0000" pattern="^\+?[0-9\s()-]{10,}$"/>
                                             <label for="telefoneEmpresa">Telefone da empresa</label>
                                             <div class="valid-feedback">
                                                 Perfeito!

@@ -67,15 +67,13 @@
             <c:choose>
                 <c:when test="${RENOVACAO_ESTAGIO == null}">
                     <c:choose>
-                        <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name()}">
-        <%--                    TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
+                        <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name() || 'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name() || 'NOVO_STEP4' == NOVO_ESTAGIO.status.name() || 'NOVO_STEP4_DOCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
+                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#" data-toggle="modal" data-target="#statusPedidoModal">
                                 <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
                         <c:when test="${'NOVO_STEP2' == NOVO_ESTAGIO.status.name()}">
-                            <%--TODO tela para avisar q está esperando resposta do docente--%>
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
                                 <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
@@ -83,13 +81,6 @@
                         </c:when>
                         <c:when test="${'NOVO_STEP2_REJEITADO' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name()}">
-                            <%--TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
                                 <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
@@ -106,13 +97,7 @@
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
-                        <c:when test="${'NOVO_STEP4' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == NOVO_ESTAGIO.status.name()}">
+                        <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == NOVO_ESTAGIO.status.name() || 'NOVO_STEP4_ATIVIDADES_TCE' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
                                 <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
@@ -124,20 +109,8 @@
                                 <span>Novo Estágio</span>
                             </a>
                         </c:when>
-                        <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
                         <c:when test="${'NOVO_PEDIDO_FIM' == NOVO_ESTAGIO.status.name()}">
                             <a id="buttonNovoEstagio" class="nav-link collapsed" href="finalStep.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'PEDIDO_ENCERRADO' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
                                 <i class="fas fa-fw bi bi-clipboard-fill"></i>
                                 <span>Novo Estágio</span>
                             </a>
@@ -157,9 +130,9 @@
         <c:choose>
             <c:when test="${NOVO_ESTAGIO == null}">
                 <c:choose>
-                    <c:when test="${'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name()}">
+                    <c:when test="${'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP1' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP3' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
-                            <a class="nav-link collapsed" href="#">
+                            <a class="nav-link collapsed" href="#" data-toggle="modal" data-target="#statusPedidoModal">
                                 <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
@@ -176,14 +149,6 @@
                     <c:when test="${'RENOVACAO_STEP4' == RENOVACAO_ESTAGIO.status.name()}">
                         <li class="nav-item">
                             <a class="nav-link collapsed" href="emitirTermoAditivo.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'RENOVACAO_STEP1' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="#">
                                 <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
                                 <span>Renovação de Estágio</span>
                             </a>
@@ -316,6 +281,44 @@
             <div class="modal-footer">
                 <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
                 <a href="index.jsp" id="buttonLogout" type="submit" class="btn btn-primary" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Status Pedido Modal-->
+<div class="modal fade" id="statusPedidoModal" tabindex="-1" role="dialog" aria-labelledby="statusPedidoModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusPedidoModalLabel">Status Pedido</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <c:choose>
+                <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name()}">
+                    <div class="modal-body">Comissão de estágio analisando o pedido.</div>
+                </c:when>
+                <c:when test="${'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name() || 'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name()}">
+                    <div class="modal-body">Comissão de estágio analisando o recurso apresentado.</div>
+                </c:when>
+                <c:when test="${'NOVO_STEP4' == NOVO_ESTAGIO.status.name()}">
+                    <div class="modal-body">Docente Orientador analisando o Plano de Atividades e o TCE.</div>
+                </c:when>
+                <c:when test="${'NOVO_STEP4_DOCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
+                    <div class="modal-body">Aguardando assinatura do Docente Orientador.</div>
+                </c:when>
+                <c:when test="${'RENOVACAO_STEP1' == RENOVACAO_ESTAGIO.status.name()}">
+                    <div class="modal-body">Aguardando informações do Supervisor.</div>
+                </c:when>
+                <c:when test="${'RENOVACAO_STEP3' == RENOVACAO_ESTAGIO.status.name()}">
+                    <div class="modal-body">Docente Orientador analisando o relatório e as avaliações apresentadas.</div>
+                </c:when>
+            </c:choose>
+            <div class="modal-footer">
+                <button class="btn btn-primary" type="button" data-dismiss="modal">Ok</button>
             </div>
         </div>
     </div>
