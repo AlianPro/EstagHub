@@ -20,7 +20,7 @@ Este projeto é construido usando:
 - JQuery
 - Lombok
 - MapStruct
-- MySql DataBase
+- MySql Database
 - Hibernate
 - Tomcat 9.0.70
 - Jasypt
@@ -55,7 +55,7 @@ This project is built using:
 - JQuery
 - Lombok
 - MapStruct
-- MySql DataBase
+- MySql Database
 - Hibernate
 - Tomcat 9.0.70
 - Jasypt
