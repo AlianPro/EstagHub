@@ -116,7 +116,7 @@ public class PrincipalController extends HttpServlet {
         DiscenteMapperImpl discenteMapper = new DiscenteMapperImpl();
         Discente discente = discenteMapper.toDiscenteCreateAccount(discenteDTO);
         discente.criarDiscente(discente);
-        //todo verificar se criou o discente, se caso sim retornar uma mensagem de sucesso e redirecionar para o index, caso não retornar uma mensagem de erro pelo fato do email já ter um cadastro (isso é uma falha de segurança, mas é pra deixar mais intuito pro usuario)
+        //todo verificar se criou o discente, se caso sim retornar uma mensagem de sucesso e redirecionar para o index, caso não retornar uma mensagem de erro pelo fato do email já ter um cadastro (isso é uma falha de segurança, mas é pra deixar mais intuitivo pro usuario)
         req.getRequestDispatcher(INDEX).forward(req,resp);
     }
 
