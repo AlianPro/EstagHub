@@ -27,7 +27,7 @@ Este projeto é construido usando:
 - Apache Commons
 - AWS S3 Bucket
 
-![EstagHub](https://user-images.githubusercontent.com/13512651/229331328-49cd10de-85a6-4a7f-8688-15bd18923157.png)
+![EstagHub](https://github.com/AlianPro/EstagHub/assets/13512651/941acf25-94c3-40f7-8b9f-9162591a5496)
 >EstagHub
 
 ## :unlock:Licença 
@@ -61,7 +61,7 @@ This project is built using:
 - Apache Commons
 - AWS S3 Bucket
 
-![EstagHub](https://user-images.githubusercontent.com/13512651/229331328-49cd10de-85a6-4a7f-8688-15bd18923157.png)
+![EstagHub](https://github.com/AlianPro/EstagHub/assets/13512651/941acf25-94c3-40f7-8b9f-9162591a5496)
 >EstagHub
 
 ## :unlock:License 
