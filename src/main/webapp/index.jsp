@@ -194,6 +194,7 @@
                         if (data.forgotPassword) {
                             alert('Um código para resetar a sua senha foi enviado para o email informado!');
                             $('div[id^=forgotPasswordModal]').modal('hide');
+                            document.getElementById('newPasswordForm').reset();
                             $('div[id^=newPasswordModal]').modal('show');
                             $.ajax({
                                 type: "POST",
@@ -234,6 +235,7 @@
                         if (data.newPassword) {
                             alert("Senha alterada com sucesso!");
                             $('div[id^=newPasswordModal]').modal('hide');
+                            document.getElementById('loginForm').reset();
                             $('div[id^=loginModal]').modal('show');
                         }else{
                             alert(data.message);
@@ -596,7 +598,7 @@
                             </div>
                             <div class="d-grid mb-3"><button class="btn btn-primary rounded-pill btn-lg" id="submitButtonLogin" name="submitButtonLogin" value="login" type="button" onclick="onLogin()">Enviar</button></div>
                             <div class="text-center">
-                                <a class="btn" style="font-size: 0.875em; color:#2937f0" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal">Esqueceu a senha?</a>
+                                <a class="btn" style="font-size: 0.875em; color:#2937f0" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" onclick="document.getElementById('forgotPasswordForm').reset()">Esqueceu a senha?</a>
                             </div>
                         </form>
                     </div>
@@ -636,7 +638,7 @@
                             </div>
                             <div class="d-grid mb-3"><button class="btn btn-primary rounded-pill btn-lg" id="submitButtonForgotPassword" name="submitButtonForgotPassword" value="forgotPassword" type="button" onclick="onForgotPassword()">Enviar</button></div>
                             <div class="text-center">
-                                <a class="btn" style="font-size: 0.875em; color:#2937f0" data-bs-toggle="modal" data-bs-target="#loginModal">Realizar Login!</a>
+                                <a class="btn" style="font-size: 0.875em; color:#2937f0" data-bs-toggle="modal" data-bs-target="#loginModal" onclick="document.getElementById('loginForm').reset()">Realizar Login!</a>
                             </div>
                         </form>
                     </div>
