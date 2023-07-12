@@ -19,16 +19,19 @@
     <link href="css/sb-admin-2.css" rel="stylesheet">
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
     <script>
         function logout(){
             $.ajax({
                 type: "POST",
                 url: "principalController",
+                async: false,
                 data: {
                     buttonLogout: 'logout'
-                },
-                sucess: function (){
-                    return true;
                 }
             });
         }
@@ -70,27 +73,44 @@
             </a>
         </li>
 
-        <!-- Nav Item - Criar Docente Collapse Menu -->
+        <!-- Nav Item - Gerenciar Docente Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="criarDocente.jsp">
-                <i class="fas fa-fw bi bi-person-fill-add"></i>
-                <span>Criar Docente</span>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesDocente" aria-expanded="true" aria-controls="collapsePages">
+                <i class="fas fa-fw bi bi-person-fill-gear"></i>
+                <span>Gerenciar Docente</span>
             </a>
+            <div id="collapsePagesDocente" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar" style="">
+                <div class="bg-light py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="criarDocente.jsp">Criar Docente</a>
+                    <a class="collapse-item" href="editarDocente.jsp">Editar Docente</a>
+                </div>
+            </div>
         </li>
-
-        <!-- Nav Item - Criar Curso Collapse Menu -->
+        <!-- Nav Item - Gerenciar Curso Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="criarCurso.jsp">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesCurso" aria-expanded="true" aria-controls="collapsePages">
                 <i class="fas fa-fw bi bi-mortarboard-fill"></i>
-                <span>Criar Curso</span>
+                <span>Gerenciar Curso</span>
             </a>
+            <div id="collapsePagesCurso" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar" style="">
+                <div class="bg-light py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="criarCurso.jsp">Criar Curso</a>
+                    <a class="collapse-item" href="editarCurso.jsp">Editar Curso</a>
+                </div>
+            </div>
         </li>
-        <!-- Nav Item - Criar Departamento Collapse Menu -->
+        <!-- Nav Item - Gerenciar Departamento Collapse Menu -->
         <li class="nav-item">
-            <a class="nav-link collapsed" href="criarDepartamento.jsp">
-                <i class="fas fa-fw bi bi-building-fill-add"></i>
-                <span>Criar Departamento</span>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePagesDepartamento" aria-expanded="true" aria-controls="collapsePages">
+                <i class="fas fa-fw bi bi-building-fill-gear"></i>
+                <span>Gerenciar Departamento</span>
             </a>
+            <div id="collapsePagesDepartamento" class="collapse" aria-labelledby="headingPages" data-parent="#accordionSidebar" style="">
+                <div class="bg-light py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="criarDepartamento.jsp">Criar Departamento</a>
+                    <a class="collapse-item" href="editarDepartamento.jsp">Editar Departamento</a>
+                </div>
+            </div>
         </li>
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
@@ -124,13 +144,18 @@
                     <li class="nav-item dropdown no-arrow">
                         <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DOCENTE.nome}"></c:out></span>
+                            <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DOCENTE_COMISSAO.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
+                            <a class="dropdown-item" href="editarPerfilDocenteComissao.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -195,17 +220,8 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap core JavaScript-->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Core plugin JavaScript-->
-<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
 <!-- Custom scripts for all pages-->
 <script src="js/sb-admin-2.min.js"></script>
-
 </body>
 
 </html>

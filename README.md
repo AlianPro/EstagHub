@@ -19,7 +19,6 @@ Este projeto é construido usando:
 - Bootstrap
 - JQuery
 - Lombok
-- MapStruct
 - MySql Database
 - Hibernate
 - Tomcat 9.0.70
@@ -54,7 +53,6 @@ This project is built using:
 - Bootstrap
 - JQuery
 - Lombok
-- MapStruct
 - MySql Database
 - Hibernate
 - Tomcat 9.0.70

@@ -20,17 +20,15 @@
     <!-- Bootstrap core JavaScript-->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script>
         $(document).ready(function (){
-            $("#submitButtonDiscenteCadastroNovoEstagio1").click(function (){
+            $("#submitButtonDiscenteCadastroRenovacaoEstagio1").click(function (){
                 let formLogin = document.getElementById('discenteForm');
                 if(formLogin) {
                     const forms = document.querySelectorAll('.needs-validation');
@@ -45,39 +43,66 @@
                     });
                 }
             });
+            $('#selectCursoDiscente').select2();
         });
-        function goToNextStep(){
-            let formLogin = document.getElementById('discenteForm');
-            if(formLogin) {
-                const forms = document.querySelectorAll('.needs-validation');
-                Array.prototype.slice.call(forms).forEach((formLogin) => {
-                    formLogin.addEventListener('submit', (event) => {
-                        if (!formLogin.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            return false;
-                        }else{
-                            return true;
-                        }
-                        formLogin.classList.add('was-validated');
-                    }, false);
-                });
-            }
+        function sendNextPage(tipoPedido){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                data: {
+                    buttonPedido: 'pedido',
+                    tipoPedido: tipoPedido
+                },
+                dataType: "json",
+                success: function (data){
+                    if('RENOVACAO' === data.page){
+                        window.location.replace("renovacaoEstagio.jsp");
+                    }else if('NOVO' === data.page){
+                        window.location.replace("novoEstagio.jsp");
+                    }
+                }
+            });
         }
         function logout(){
             $.ajax({
                 type: "POST",
                 url: "principalController",
+                async: false,
                 data: {
                     buttonLogout: 'logout'
-                },
-                sucess: function (){
-                    return true;
                 }
             });
         }
     </script>
-
+    <style>
+        .select2-container .select2-selection--single {
+            height: calc(2.25rem + 2px);
+            padding: 0.4rem 2.25rem 0 0.75rem;
+            font-size: 1rem;
+            font-weight: 500;
+            line-height: 1.25;
+            color: #212529;
+            background-color: #fff;
+            border: 1px solid #ced4da;
+            border-radius: .25rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            -moz-padding-start: calc(0.75rem - 3px);
+        }
+        .select2-container .select2-selection--single:focus {
+            border-color: #ced4da;
+            outline: 0;
+            box-shadow: 0 0 0 .25rem rgba(206, 212, 218, 1);
+        }
+        .select2-container .select2-selection--single .select2-selection__arrow {
+            height: 100%;
+            top: auto;
+            bottom: 0;
+            border-color: #ced4da;
+        }
+        .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable{
+            background-color:#2b36f0 !important;
+        }
+    </style>
 </head>
 
 <body id="page-top">
@@ -109,145 +134,23 @@
 
         <!-- Nav Item - Novo estágio Collapse Menu -->
         <li class="nav-item">
-            <c:choose>
-                <c:when test="${RENOVACAO_ESTAGIO == null}">
-                    <c:choose>
-                        <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name()}">
-                            <%--                    TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP2' == NOVO_ESTAGIO.status.name()}">
-                            <%--TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP2_REJEITADO' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name()}">
-                            <%--TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP3' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4_TCE' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_PEDIDO_FIM' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:otherwise>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="novoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
-                </c:when>
-            </c:choose>
+            <c:if test="${RENOVACAO_ESTAGIO == null}">
+                <a class="nav-link collapsed btn" onclick="sendNextPage('NOVO')">
+                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
+                    <span>Novo Estágio</span>
+                </a>
+            </c:if>
         </li>
 
         <!-- Nav Item - Renovação de estágio Collapse Menu -->
-        <c:choose>
-            <c:when test="${NOVO_ESTAGIO == null}">
-                <c:choose>
-                    <c:when test="${'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'RENOVACAO_STEP3_REJEITADO' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'RENOVACAO_STEP4' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="emitirTermoAditivo.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'RENOVACAO_STEP1' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'NOVO_PEDIDO_FIM' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:otherwise>
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="renovacaoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:otherwise>
-                </c:choose>
-            </c:when>
-        </c:choose>
-
+        <li class="nav-item">
+            <c:if test="${NOVO_ESTAGIO == null}">
+                <a class="nav-link collapsed btn" onclick="sendNextPage('RENOVACAO')">
+                    <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
+                    <span>Renovação de Estágio</span>
+                </a>
+            </c:if>
+        </li>
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
 
@@ -282,13 +185,16 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DISCENTE.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-
-
+                            <a class="dropdown-item" href="editarPerfilDiscente.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -304,7 +210,7 @@
             <!-- Begin Page Content -->
             <div class="container-fluid">
                 <!-- Page Heading -->
-                <h1 class="h3 mb-4 text-gray-800">Criar Novo Estágio</h1>
+                <h1 class="h3 mb-4 text-gray-800">Criar Pedido - Renovação Estágio</h1>
             </div>
             <!-- /.container-fluid -->
             <div class="modal-body border-0 p-4">
@@ -344,7 +250,7 @@
                                 </div>
                                 <div class="form-floating mb-3">
                                     <label for="iraDiscente">IRA</label>
-                                    <input class="form-control" id="iraDiscente" type="text" name="iraDiscente" required placeholder="Índice de Rendimento Acadêmico"/>
+                                    <input class="form-control" id="iraDiscente" type="text" name="iraDiscente" required placeholder="Índice de Rendimento Acadêmico (Exemplo: 7.0)" pattern="^\d+(\.\d+)?$"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -354,7 +260,7 @@
                                 </div>
                                 <div class="form-floating mb-3">
                                     <label for="periodoDiscente">Período</label>
-                                    <input class="form-control" id="periodoDiscente" type="text" name="periodoDiscente" required placeholder="Período do Curso"/>
+                                    <input class="form-control" id="periodoDiscente" type="text" name="periodoDiscente" required placeholder="Período do Curso (Exemplo: 6)" pattern="^\d+$"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -364,7 +270,7 @@
                                 </div>
                                 <div class="form-floating mb-3">
                                     <label for="cargaHorariaCumpridaDiscente">Carga Horária Cumprida</label>
-                                    <input class="form-control" id="cargaHorariaCumpridaDiscente" type="text" name="cargaHorariaCumpridaDiscente" required placeholder="Carga Hóraria Cumprida em Horas"/>
+                                    <input class="form-control" id="cargaHorariaCumpridaDiscente" type="text" name="cargaHorariaCumpridaDiscente" required placeholder="Carga Hóraria Cumprida em Horas (Exemplo: 2900)" pattern="^\d+$"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -403,13 +309,13 @@
                                     </div>
                                 </div>
                                 <div class="form-outline mb-3" id="textAreaDiv">
-                                    <label class="form-label" for="textResumo">Resumo das Atividades Exercidas no Estágio Atualmente</label>
+                                    <label class="form-label" for="textResumo">Resumo das atividades exercidas no Estágio atualmente</label>
                                     <textarea class="form-control" id="textResumo" name="textResumo" required></textarea>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
                                     <div class="invalid-feedback">
-                                        Ops! Informe um Resumo das Atividades Exercidas no Estágio Atualmente.
+                                        Ops! Informe um Resumo das atividades exercidas no Estágio atualmente.
                                     </div>
                                 </div>
                                 <div class="form-floating mb-3">
@@ -427,7 +333,7 @@
                                     </div>
                                 </div>
                                 <div class="form-outline mb-3">
-                                    <label class="form-check-label">Há quanto tempo você Estagia nesta Empresa?</label>
+                                    <label class="form-check-label">Há quanto tempo você estagia nesta Empresa?</label>
                                 </div>
                                 <div class="form-check form-check-inline">
                                     <input class="form-check-input" type="radio" name="radioTempoEstagio" id="radioTempoEstagio1" value="Há 6 meses" required/>
@@ -472,7 +378,7 @@
                                 </div>
                                 <div class="form-floating mb-3">
                                     <label for="historicoDiscente">Anexe o Histórico Acadêmico:</label>
-                                    <input id="historicoDiscente" name="historicoDiscente" required type="file" accept=".pdf"/>
+                                    <input id="historicoDiscente" name="historicoDiscente" required type="file"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -482,7 +388,7 @@
                                 </div>
                                 <div class="form-floating mb-3">
                                     <label for="gradeHorarioDiscente">Anexe a Grade de Horário:</label>
-                                    <input id="gradeHorarioDiscente" name="gradeHorarioDiscente" required type="file" accept=".pdf"/>
+                                    <input id="gradeHorarioDiscente" name="gradeHorarioDiscente" required type="file"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -540,7 +446,8 @@
             </div>
         </div>
     </div>
-
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
 </body>
 
 </html>

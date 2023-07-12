@@ -19,20 +19,30 @@
     <link href="css/sb-admin-2.css" rel="stylesheet">
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
+    <!-- Bootstrap core JavaScript-->
+    <script src="vendor/jquery/jquery.min.js"></script>
+    <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- Core plugin JavaScript-->
+    <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
     <script>
         function sendNextPage(idPedido, statusPedido){
             $.ajax({
                 type: "POST",
                 url: "supervisorController",
+                cache: false,
                 data: {
                     buttonPedido: 'pedido',
                     idPedido: idPedido,
                     statusPedido: statusPedido
                 },
+                dataType: "json",
                 success: function (){
                     if('RENOVACAO_STEP1' === statusPedido){
                         window.location.replace("renovacaoStep2.jsp");
                     }
+                },
+                error: function (xhr, status, error) {
+                    alert('Erro em processar os dados!');
                 }
             });
         }
@@ -40,11 +50,9 @@
             $.ajax({
                 type: "POST",
                 url: "principalController",
+                async: false,
                 data: {
                     buttonLogout: 'logout'
-                },
-                sucess: function (){
-                    return true;
                 }
             });
         }
@@ -85,7 +93,13 @@
                 <span>Pedidos</span>
             </a>
         </li>
-
+        <!-- Nav Item - Vincular Pedido Collapse Menu -->
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="vincularPedidoSupervisor.jsp">
+                <i class="fas fa-fw bi bi-file-earmark-plus-fill"></i>
+                <span>Vincular ao Pedido</span>
+            </a>
+        </li>
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
 
@@ -120,12 +134,16 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${SUPERVISOR.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-
+                            <a class="dropdown-item" href="editarPerfilSupervisor.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -152,19 +170,17 @@
                         <div class="tab-pane" style="display: block">
                             <div class="row">
                                 <c:forEach var="pedido" items="${PEDIDOS_RENOVACAO}" varStatus="i">
-                                    <c:choose>
-                                        <c:when test="${'RENOVACAO' == pedido.tipo.name() && 'RENOVACAO_STEP1' == pedido.status.name()}">
-                                            <div class="col">
-                                                <div class="card" style="text-align: center">
-                                                    <div class="card-body">
-                                                        <h5 class="card-title">Renovação de Estágio - ${pedido.id}</h5>
-                                                        <p class="card-text">${pedido.discente.getNome()}</p>
-                                                        <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
-                                                    </div>
+                                    <c:if test="${'RENOVACAO' == pedido.tipo.name() && 'RENOVACAO_STEP1' == pedido.status.name()}">
+                                        <div class="col">
+                                            <div class="card" style="text-align: center">
+                                                <div class="card-body">
+                                                    <h5 class="card-title">Renovação de Estágio - ${pedido.id}</h5>
+                                                    <p class="card-text">${pedido.discente.getNome()}</p>
+                                                    <a href="#" class="btn btn-primary" onclick="sendNextPage(${pedido.id}, '${pedido.status.name()}')">Avançar</a>
                                                 </div>
                                             </div>
-                                        </c:when>
-                                    </c:choose>
+                                        </div>
+                                    </c:if>
                                     <c:if test="${i.count % 3 == 0}">
                                         <div class="w-100"></div>
                                     </c:if>
@@ -215,17 +231,8 @@
         </div>
     </div>
 </div>
-
-<!-- Bootstrap core JavaScript-->
-<script src="vendor/jquery/jquery.min.js"></script>
-<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
-<!-- Core plugin JavaScript-->
-<script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
 <!-- Custom scripts for all pages-->
 <script src="js/sb-admin-2.min.js"></script>
-
 </body>
 
 </html>

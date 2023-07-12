@@ -12,11 +12,4 @@ public enum StatusPedido {
         return status;
     }
 
-    public static StatusPedido getInstance(int status) {
-        for (StatusPedido sp : values()){
-            if(sp.getStatus() == status)
-                return sp;
-        }
-        return null;
-    }
 }

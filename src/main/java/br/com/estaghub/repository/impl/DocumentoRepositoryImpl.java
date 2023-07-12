@@ -1,8 +1,10 @@
 package br.com.estaghub.repository.impl;
 
 import br.com.estaghub.domain.*;
+import br.com.estaghub.domain.embeddable.PlanoAtividades;
+import br.com.estaghub.domain.embeddable.TCE;
+import br.com.estaghub.domain.embeddable.TermoAditivo;
 import br.com.estaghub.enums.TipoDocumento;
-import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.repository.DocumentoRepository;
 import br.com.estaghub.util.HibernateUtil;
 
@@ -10,6 +12,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public class DocumentoRepositoryImpl implements DocumentoRepository {
@@ -23,15 +26,6 @@ public class DocumentoRepositoryImpl implements DocumentoRepository {
         em.getTransaction().commit();
         em.close();
     }
-
-    @Override
-    public Documento getDocumentoById(Long id) {
-        try {
-            return em.find(Documento.class,id);
-        }finally {
-            em.close();
-        }
-    }
     @Override
     public Optional<Documento> getDocumentoByIdPedidoAndTipoDocumento(Long idPedido, TipoDocumento tipoDocumento) {
         try {
@@ -40,6 +34,16 @@ public class DocumentoRepositoryImpl implements DocumentoRepository {
             queryGetDocumentoByIdPedidoAndTipoDocumento.setParameter("pedido", pedido.getPedidoById(idPedido));
             queryGetDocumentoByIdPedidoAndTipoDocumento.setParameter("tipo", tipoDocumento);
             return Optional.ofNullable(queryGetDocumentoByIdPedidoAndTipoDocumento.getResultList().isEmpty()? null:queryGetDocumentoByIdPedidoAndTipoDocumento.getSingleResult());
+        }finally {
+            em.close();
+        }
+    }
+    @Override
+    public List<Documento> getAllDocumentosFromThatPedido(Long idPedido) {
+        try{
+            TypedQuery<Documento> query = em.createQuery("SELECT d FROM Documento d where d.pedido.id = :idPedido", Documento.class);
+            query.setParameter("idPedido", idPedido);
+            return query.getResultList();
         }finally {
             em.close();
         }
@@ -89,12 +93,11 @@ public class DocumentoRepositoryImpl implements DocumentoRepository {
     }
     @Override
     public void addTermoAditivoInDocumento(String idDocumento, TermoAditivo termoAditivo) {
-        Query query = em.createQuery("UPDATE Documento set data_antiga_termo_aditivo = :data_antiga_termo_aditivo, data_nova_termo_aditivo = :data_nova_termo_aditivo, nome_seguradora_termo_aditivo = :nome_seguradora_termo_aditivo , codigo_apolice_termo_aditivo = :codigo_apolice_termo_aditivo , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :idDocumento");
+        Query query = em.createQuery("UPDATE Documento set data_antiga_termo_aditivo = :data_antiga_termo_aditivo, data_nova_termo_aditivo = :data_nova_termo_aditivo, nome_seguradora_termo_aditivo = :nome_seguradora_termo_aditivo , codigo_apolice_termo_aditivo = :codigo_apolice_termo_aditivo WHERE id = :idDocumento");
         query.setParameter("data_antiga_termo_aditivo", termoAditivo.getDataAntiga());
         query.setParameter("data_nova_termo_aditivo", termoAditivo.getDataNova());
         query.setParameter("nome_seguradora_termo_aditivo", termoAditivo.getNomeSeguradora());
         query.setParameter("codigo_apolice_termo_aditivo", termoAditivo.getCodApolice());
-        query.setParameter("data_hora_ult_atualizacao", LocalDateTime.now());
         query.setParameter("idDocumento", Long.parseLong(idDocumento));
         em.getTransaction().begin();
         query.executeUpdate();

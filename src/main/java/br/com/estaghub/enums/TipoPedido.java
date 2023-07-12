@@ -12,11 +12,4 @@ public enum TipoPedido {
         return tipo;
     }
 
-    public static TipoPedido getInstance(int tipo) {
-        for (TipoPedido tp : values()){
-            if(tp.getTipo() == tipo)
-                return tp;
-        }
-        return null;
-    }
 }

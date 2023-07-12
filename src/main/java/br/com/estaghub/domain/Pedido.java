@@ -1,5 +1,6 @@
 package br.com.estaghub.domain;
 
+import br.com.estaghub.domain.embeddable.RenovacaoEstagio;
 import br.com.estaghub.enums.StatusPedido;
 import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.repository.impl.PedidoRepositoryImpl;
@@ -8,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,12 +39,16 @@ public class Pedido {
     @OneToMany(mappedBy = "pedido")
     private List<Documento> documentos;
     @Column(name = "justificativa_discente")
+    @NotBlank
     private String justificativaDiscente;
     @Column(name = "justificativa_docente")
+    @NotBlank
     private String justificativaDocente;
     @Column(name = "justificativa_recurso")
+    @NotBlank
     private String justificativaRecurso;
     @Column(name = "justificativa_documentacao")
+    @NotBlank
     private String justificativaDocumentacao;
     @Enumerated(EnumType.STRING)
     private TipoPedido tipo;
@@ -70,10 +76,6 @@ public class Pedido {
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
         return pedidoRepository.getPedidoById(id);
     }
-    public Boolean getPedidoByIdWhereSupervisorNotSet(String numPedido){
-        PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
-        return pedidoRepository.getPedidoByIdWhereSupervisorNotSet(Long.parseLong(numPedido));
-    }
     public void addSupervisorNoPedido(Supervisor supervisor, String numPedido){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
         pedidoRepository.addSupervisorNoPedido(supervisor, numPedido);
@@ -82,13 +84,14 @@ public class Pedido {
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
         return pedidoRepository.getPedidoByDiscente(discente, tipoPedido);
     }
-    public Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido){
+
+    public List<Pedido> getAllPedidosOfDocenteComissao(Docente docente){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
-        return pedidoRepository.checkIfDiscenteAlreadyHavePedido(discente, tipoPedido);
+        return pedidoRepository.getAllPedidosOfDocenteComissao(docente);
     }
-    public List<Pedido> getAllPedidos(){
+    public List<Pedido> getAllRenovPedidosInStep1WithoutSupervisor(){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();
-        return pedidoRepository.getAllPedidos();
+        return pedidoRepository.getAllRenovPedidosInStep1WithoutSupervisor();
     }
     public void changeStatusPedido(String idPedido, StatusPedido statusPedido){
         PedidoRepositoryImpl pedidoRepository = new PedidoRepositoryImpl();

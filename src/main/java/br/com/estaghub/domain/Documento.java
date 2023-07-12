@@ -1,5 +1,8 @@
 package br.com.estaghub.domain;
 
+import br.com.estaghub.domain.embeddable.PlanoAtividades;
+import br.com.estaghub.domain.embeddable.TCE;
+import br.com.estaghub.domain.embeddable.TermoAditivo;
 import br.com.estaghub.enums.TipoDocumento;
 import br.com.estaghub.repository.impl.DocumentoRepositoryImpl;
 import lombok.AllArgsConstructor;
@@ -7,8 +10,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 @Entity
@@ -20,6 +25,7 @@ public class Documento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     private String nome;
     @ManyToOne
     @JoinColumn(name="id_pedido")
@@ -77,6 +83,10 @@ public class Documento {
     public Optional<Documento> getDocumentoByIdPedidoAndTipoDocumento(Long idPedido, TipoDocumento tipoDocumento){
         DocumentoRepositoryImpl documentoRepository = new DocumentoRepositoryImpl();
         return documentoRepository.getDocumentoByIdPedidoAndTipoDocumento(idPedido, tipoDocumento);
+    }
+    public List<Documento> getAllDocumentosFromThatPedido(Long idPedido){
+        DocumentoRepositoryImpl documentoRepository = new DocumentoRepositoryImpl();
+        return documentoRepository.getAllDocumentosFromThatPedido(idPedido);
     }
     public void addPlanoAtividadesInDocumento(String idDocumento, PlanoAtividades planoAtividades){
         DocumentoRepositoryImpl documentoRepository = new DocumentoRepositoryImpl();

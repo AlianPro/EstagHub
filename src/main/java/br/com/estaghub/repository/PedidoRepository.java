@@ -14,10 +14,9 @@ public interface PedidoRepository {
     void criarPedido(Pedido pedido);
     Pedido getPedidoById(Long id);
     Optional<Pedido> getPedidoByDiscente(Discente discente, TipoPedido tipoPedido);
-    Boolean getPedidoByIdWhereSupervisorNotSet(Long id);
     void addSupervisorNoPedido(Supervisor supervisor, String numPedido);
-    Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido);
-    List<Pedido> getAllPedidos();
+    List<Pedido> getAllPedidosOfDocenteComissao(Docente docente);
+    List<Pedido> getAllRenovPedidosInStep1WithoutSupervisor();
     void changeStatusPedido(String idPedido, StatusPedido statusPedido);
     void changeJustificativaDocentePedido(String idPedido, String justificativa);
     void changeJustificativaDiscentePedido(String idPedido, String justificativa);

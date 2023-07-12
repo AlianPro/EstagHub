@@ -20,15 +20,11 @@
     <!-- Bootstrap core JavaScript-->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js" integrity="sha512-T/tUfKSV1bihCnd+MxKD0Hm1uBBroVYBOYSk1knyvQ9VyZJpc/ALb4P0r6ubwVPSGB2GvjeoMAJJImBG12TiaQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt-BR.min.js" integrity="sha512-mVkLPLQVfOWLRlC2ZJuyX5+0XrTlbW2cyAwyqgPkLGxhoaHNSWesYMlcUjX8X+k45YB8q90s88O7sos86636NQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
@@ -59,72 +55,74 @@
                     }, false);
                 });
             }
-            $('#dataInicio').datepicker({
-                format: "dd/mm/yyyy",
-                language: "pt-BR",
-                autoclose: true,
-                todayHighlight: true
-            });
-            $('#dataFim').datepicker({
+            $('input[id^=dataInicio], input[id^=dataFim], input[id^=dataInicioTCE], input[id^=dataFimTCE]').datepicker({
                 format: "dd/mm/yyyy",
                 language: "pt-BR",
                 autoclose: true,
                 todayHighlight: true
             });
         });
-        function goToNextStep(){
-            let formLogin = document.getElementById('discenteForm');
-            if(formLogin) {
-                const forms = document.querySelectorAll('.needs-validation');
-                Array.prototype.slice.call(forms).forEach((formLogin) => {
-                    formLogin.addEventListener('submit', (event) => {
-                        if (!formLogin.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            return false;
-                        }else{
-                            return true;
-                        }
-                        formLogin.classList.add('was-validated');
-                    }, false);
-                });
-            }
+        function sendNextPage(tipoPedido){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                data: {
+                    buttonPedido: 'pedido',
+                    tipoPedido: tipoPedido
+                },
+                dataType: "json",
+                success: function (data){
+                    if('TCE' === data.page){
+                        window.location.replace("emitirTCE.jsp");
+                    }
+                }
+            });
         }
         function logout(){
             $.ajax({
                 type: "POST",
                 url: "principalController",
+                async: false,
                 data: {
                     buttonLogout: 'logout'
-                },
-                sucess: function (){
-                    return true;
                 }
             });
         }
-        function hideTextAreaTCEPreenchido(){
-            $("#discenteForm").children().prop('disabled',false);
-            $("#discenteForm").prop('hidden',false);
-            $("#modeloTCEUFRRJ").children().prop('disabled',true);
-            $("#modeloTCEUFRRJ").prop('hidden',true);
-            $("#tceAssinado").children().prop('disabled',true);
-            $("#tceAssinado").prop('hidden',true);
+        function hideTextAreaTCE(option){
+            if ('empresa' === option || 'branco' === option){
+                $("#discenteForm").children().prop('disabled',true);
+                $("#discenteForm").prop('hidden',true);
+                $("#tceAssinado").children().prop('disabled',false);
+                $("#tceAssinado").prop('hidden',false);
+            }else {
+                $("#discenteForm").children().prop('disabled',false);
+                $("#discenteForm").prop('hidden',false);
+                $("#tceAssinado").children().prop('disabled',true);
+                $("#tceAssinado").prop('hidden',true);
+            }
+            if ('empresa' === option || 'gerar' === option){
+                $("#modeloTCEUFRRJ").children().prop('disabled',true);
+                $("#modeloTCEUFRRJ").prop('hidden',true);
+            }else {
+                $("#modeloTCEUFRRJ").children().prop('disabled',false);
+                $("#modeloTCEUFRRJ").prop('hidden',false);
+            }
         }
-        function hideTextAreaTCEPreenchidoEmpresa(){
-            $("#discenteForm").children().prop('disabled',true);
-            $("#discenteForm").prop('hidden',true);
-            $("#modeloTCEUFRRJ").children().prop('disabled',true);
-            $("#modeloTCEUFRRJ").prop('hidden',true);
-            $("#tceAssinado").children().prop('disabled',false);
-            $("#tceAssinado").prop('hidden',false);
-        }
-        function hideTextAreaTCEPreenchidoUFRRJ(){
-            $("#discenteForm").children().prop('disabled',true);
-            $("#discenteForm").prop('hidden',true);
-            $("#modeloTCEUFRRJ").children().prop('disabled',false);
-            $("#modeloTCEUFRRJ").prop('hidden',false);
-            $("#tceAssinado").children().prop('disabled',false);
-            $("#tceAssinado").prop('hidden',false);
+        function finishPedido(){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                async: false,
+                data: {
+                    submitButtonDiscenteFinalizar: 'finalizarPedido'
+                },
+                dataType: "json",
+                success: function (data){
+                    if (data.finished){
+                        window.location.replace("discente.jsp");
+                    }
+                }
+            });
         }
     </script>
 
@@ -159,87 +157,19 @@
 
         <!-- Nav Item - Novo estágio Collapse Menu -->
         <li class="nav-item">
-            <c:choose>
-                <c:when test="${RENOVACAO_ESTAGIO == null}">
-                    <c:choose>
-                        <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name()}">
-                            <%--                    TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP2' == NOVO_ESTAGIO.status.name()}">
-                            <%--TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP2_REJEITADO' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name()}">
-                            <%--TODO tela para avisar q está esperando resposta do docente--%>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP3' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4_TCE' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:when test="${'NOVO_PEDIDO_FIM' == NOVO_ESTAGIO.status.name()}">
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:when>
-                        <c:otherwise>
-                            <a id="buttonNovoEstagio" class="nav-link collapsed" href="novoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                <span>Novo Estágio</span>
-                            </a>
-                        </c:otherwise>
-                    </c:choose>
-                </c:when>
-            </c:choose>
+            <c:if test="${RENOVACAO_ESTAGIO == null}">
+                <div class="d-flex">
+                    <a class="nav-link collapsed btn" onclick="sendNextPage('NOVO')">
+                        <i class="fas fa-fw bi bi-clipboard-fill"></i>
+                        <span>Novo Estágio</span>
+                    </a>
+                    <c:if test="${NOVO_ESTAGIO != null}">
+                        <a type="btn" style="padding-right: 15px; padding-top:17px;" href="#" data-toggle="modal" data-target="#finishModal">
+                            <img src="https://img.icons8.com/fluency/48/cancel.png" alt="cross-mark-emoji" width="16" height="16">
+                        </a>
+                    </c:if>
+                </div>
+            </c:if>
         </li>
 
         <!-- Divider -->
@@ -276,13 +206,16 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DISCENTE.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-
-
+                            <a class="dropdown-item" href="editarPerfilDiscente.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -305,34 +238,34 @@
                 <div class="sw sw-theme-basic sw-justified">
                     <div class="tab-content">
                         <div class="tab-pane" style="display: block">
+                            <div class="form-outline mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="radioTCE" id="tceEmpresa" required onclick="hideTextAreaTCE('empresa')">
+                                    <label class="form-check-label" for="tceEmpresa">Enviar TCE Usando o Modelo da Empresa</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="radioTCE" id="tceBranco" required onclick="hideTextAreaTCE('branco')">
+                                    <label class="form-check-label" for="tceBranco">Enviar TCE Usando o Modelo da UFRRJ em Branco</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="radioTCE" id="tceGerar" required onclick="hideTextAreaTCE('gerar')">
+                                    <label class="form-check-label" for="tceGerar">Gerar TCE</label>
+                                </div>
+                            </div>
+                            <div class="form-floating mb-3" id="modeloTCEUFRRJ" hidden>
+                                <label for="tceDiscente">Visualizar o Modelo em Branco do TCE da UFRRJ:</label>
+                                <a id="tceDiscente" href="${TCE_MODELO_UFRRJ_URL}">${TCE_MODELO_UFRRJ}</a>
+                            </div>
                             <c:choose>
                                 <c:when test="${'NOVO_STEP4_TCE'== NOVO_ESTAGIO.status.name()}">
-                                    <div class="form-outline mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceEmpresa" value="empresa" required onclick="hideTextAreaTCEPreenchidoEmpresa()">
-                                            <label class="form-check-label" for="tceEmpresa">Enviar TCE Usando o Modelo da Empresa</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceBranco" value="branco" required onclick="hideTextAreaTCEPreenchidoUFRRJ()">
-                                            <label class="form-check-label" for="tceBranco">Enviar TCE Usando o Modelo da UFRRJ em Branco</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceGerar" value="gerar" required onclick="hideTextAreaTCEPreenchido()">
-                                            <label class="form-check-label" for="tceGerar">Gerar TCE</label>
-                                        </div>
-                                    </div>
-                                    <div class="form-floating mb-3" id="modeloTCEUFRRJ" hidden>
-                                        <label for="tceDiscente">Visualizar o Modelo em Branco do TCE da UFRRJ:</label>
-                                        <a id="tceDiscente" href="${TCE_MODELO_UFRRJ_URL}">${TCE_MODELO_UFRRJ}</a>
-                                    </div>
                                     <form class="needs-validation" enctype="multipart/form-data" novalidate id="tceAssinado" name="discenteForm" action="discenteController" method="post" hidden>
                                         <div class="form-floating mb-3">
-                                            <label for="erroDocumentoPreenchido">Erro(s) Identificado(s) pelo(a) Docente Orientador</label>
+                                            <label for="erroDocumentoPreenchido">Erro(s) Identificado(s) pelo(a) Docente Orientador(a)</label>
                                             <input class="form-control alert alert-danger" id="erroDocumentoPreenchido" type="text" name="erroDocumento" readonly disabled value="${NOVO_ESTAGIO.justificativaDocumentacao}"/>
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="fileTCEAssinado">Anexe o TCE Preenchido e Assinado:</label>
-                                            <input id="fileTCEAssinado" name="fileTCEAssinado" required type="file" accept=".doc, .docx, .pdf"/>
+                                            <input id="fileTCEAssinado" name="fileTCEAssinado" required type="file"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -346,7 +279,7 @@
                                     </form>
                                     <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post" hidden>
                                         <div class="form-floating mb-3">
-                                            <label for="erroDocumento">Erro(s) Identificado(s) pelo(a) Docente Orientador</label>
+                                            <label for="erroDocumento">Erro(s) Identificado(s) pelo(a) Docente Orientador(a)</label>
                                             <input class="form-control alert alert-danger" id="erroDocumento" type="text" name="erroDocumento" readonly disabled value="${NOVO_ESTAGIO.justificativaDocumentacao}"/>
                                         </div>
                                         <div class="form-floating mb-3">
@@ -381,7 +314,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="intervaloEstagioTCE">Intervalo</label>
-                                            <input class="form-control" id="intervaloEstagioTCE" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas" value="${DOCUMENTO.tce.getTotalHoras()}"/>
+                                            <input class="form-control" id="intervaloEstagioTCE" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas (Exemplo: 2)" pattern="^\d+$" value="${DOCUMENTO.tce.getTotalHoras()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -391,7 +324,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="totalHorasTCE">Total Horas</label>
-                                            <input class="form-control" id="totalHorasTCE" type="text" name="totalHoras" required placeholder="Total Horas Semanais" value="${DOCUMENTO.tce.getIntervalo()}"/>
+                                            <input class="form-control" id="totalHorasTCE" type="text" name="totalHoras" required placeholder="Total Horas Semanais (Exemplo: 30)" pattern="^\d+$" value="${DOCUMENTO.tce.getIntervalo()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -421,7 +354,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="bolsaEstagioTCE">Bolsa</label>
-                                            <input class="form-control" id="bolsaEstagioTCE" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso" value="${DOCUMENTO.tce.getBolsa()}"/>
+                                            <input class="form-control" id="bolsaEstagioTCE" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso (Exemplo: Oitocentos reais)" pattern="^[\sa-zA-Z]+$" value="${DOCUMENTO.tce.getBolsa()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -431,7 +364,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="auxilioTransporteTCE">Auxílio Transporte</label>
-                                            <input class="form-control" id="auxilioTransporteTCE" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso" value="${DOCUMENTO.tce.getAuxTransporte()}"/>
+                                            <input class="form-control" id="auxilioTransporteTCE" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso (Exemplo: Duzentos reais)" pattern="^[\sa-zA-Z]+$" value="${DOCUMENTO.tce.getAuxTransporte()}"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -465,28 +398,10 @@
                                     </form>
                                 </c:when>
                                 <c:otherwise>
-                                    <div class="form-outline mb-3">
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceEmpresaPrincipal" value="empresa" required onclick="hideTextAreaTCEPreenchidoEmpresa()">
-                                            <label class="form-check-label" for="tceEmpresaPrincipal">Enviar TCE Usando o Modelo da Empresa</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceBrancoPrincipal" value="branco" required onclick="hideTextAreaTCEPreenchidoUFRRJ()">
-                                            <label class="form-check-label" for="tceBrancoPrincipal">Enviar TCE Usando o Modelo da UFRRJ em Branco</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="radioTCE" id="tceGerarPrincipal" value="gerar" required onclick="hideTextAreaTCEPreenchido()">
-                                            <label class="form-check-label" for="tceGerarPrincipal">Gerar TCE</label>
-                                        </div>
-                                    </div>
-                                    <div class="form-floating mb-3" id="modeloTCEUFRRJ" hidden>
-                                        <label for="tceDiscenteDiscentePrincipal">Visualizar o Modelo em Branco do TCE da UFRRJ:</label>
-                                        <a id="tceDiscenteDiscentePrincipal" href="${TCE_MODELO_UFRRJ_URL}">${TCE_MODELO_UFRRJ}</a>
-                                    </div>
                                     <form class="needs-validation" enctype="multipart/form-data" novalidate id="tceAssinado" name="discenteForm" action="discenteController" method="post" hidden>
                                         <div class="form-floating mb-3">
                                             <label for="fileTCEAssinadoPrincipal">Anexe o TCE Preenchido e Assinado:</label>
-                                            <input id="fileTCEAssinadoPrincipal" name="fileTCEAssinado" required type="file" accept=".doc, .docx, .pdf"/>
+                                            <input id="fileTCEAssinadoPrincipal" name="fileTCEAssinado" required type="file"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -531,7 +446,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="intervaloEstagio">Intervalo</label>
-                                            <input class="form-control" id="intervaloEstagio" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas"/>
+                                            <input class="form-control" id="intervaloEstagio" type="text" name="intervaloEstagio" required placeholder="Tempo de Intervalo em Horas (Exemplo: 2)" pattern="^\d+$"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -541,7 +456,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="totalHoras">Total Horas</label>
-                                            <input class="form-control" id="totalHoras" type="text" name="totalHoras" required placeholder="Total Horas Semanais"/>
+                                            <input class="form-control" id="totalHoras" type="text" name="totalHoras" required placeholder="Total Horas Semanais (Exemplo: 30)" pattern="^\d+$"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -571,7 +486,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="bolsaEstagio">Bolsa</label>
-                                            <input class="form-control" id="bolsaEstagio" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso"/>
+                                            <input class="form-control" id="bolsaEstagio" type="text" name="bolsaEstagio" required placeholder="Valor da Bolsa de Estágio por extenso (Exemplo: Oitocentos reais)" pattern="^[\sa-zA-Z]+$"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -581,7 +496,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="auxilioTransporte">Auxílio Transporte</label>
-                                            <input class="form-control" id="auxilioTransporte" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso"/>
+                                            <input class="form-control" id="auxilioTransporte" type="text" name="auxilioTransporte" required placeholder="Valor do Auxílio Transporte por extenso (Exemplo: Duzentos reais)" pattern="^[\sa-zA-Z]+$"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -663,6 +578,27 @@
         </div>
     </div>
 
+<!-- Finish Modal-->
+<div class="modal fade" id="finishModal" tabindex="-1" role="dialog" aria-labelledby="finishModalLabel"
+     aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="finishModalLabel">Finalizar pedido?</h5>
+                <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">Selecione "Finalizar" abaixo se você realmente deseja finalizar esse pedido.</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
+                <button class="btn btn-primary" onclick="finishPedido()">Finalizar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
 </body>
 
 </html>

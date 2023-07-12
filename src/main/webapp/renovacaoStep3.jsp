@@ -19,12 +19,8 @@
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
@@ -44,29 +40,21 @@
                 });
             }
         });
-        function sendNextPage(idPedido, statusPedido){
-            $.ajax({
-                type: "POST",
-                url: "docenteController",
-                data: {
-                    buttonPedido: 'pedido',
-                    idPedido: idPedido,
-                    statusPedido: statusPedido
-                },
-                success: function (){
-                    return true;
-                }
-            });
+        function showTextArea(){
+            $("#textAreaDiv").children().prop('disabled',false);
+            $("#textAreaDiv").prop('hidden',false);
+        }
+        function hideTextArea(){
+            $("#textAreaDiv").children().prop('disabled',true);
+            $("#textAreaDiv").prop('hidden',true);
         }
         function logout(){
             $.ajax({
                 type: "POST",
                 url: "principalController",
+                async: false,
                 data: {
                     buttonLogout: 'logout'
-                },
-                sucess: function (){
-                    return true;
                 }
             });
         }
@@ -142,13 +130,16 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DOCENTE.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-
-
+                            <a class="dropdown-item" href="editarPerfilDocente.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -183,7 +174,7 @@
                                     <p class="form-control" id="enderecoEmpresa" type="text" name="enderecoEmpresa" readonly>${PEDIDO.renovacaoEstagio.getEnderecoEmpresa()}</p>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <label for="textResumo">Resumo das Atividades Exercidas no Estágio Atualmente</label>
+                                    <label for="textResumo">Resumo das atividades exercidas no Estágio atualmente</label>
                                     <textarea class="form-control" id="textResumo" type="text" name="textResumo" readonly>${PEDIDO.renovacaoEstagio.getResumoAtividades()}</textarea>
                                 </div>
                                 <div class="form-floating mb-3">
@@ -191,7 +182,7 @@
                                     <textarea class="form-control" id="textAvaliacaoSupervisor" type="text" name="textAvaliacaoSupervisor" readonly>${PEDIDO.renovacaoEstagio.getAvaliacaoSupervisor()}</textarea>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <label for="radioTempoEstagio">Há quanto tempo você Estagia nesta Empresa?</label>
+                                    <label for="radioTempoEstagio">Há quanto tempo você estagia nesta Empresa?</label>
                                     <p class="form-control" id="radioTempoEstagio" type="text" name="radioTempoEstagio" readonly>${PEDIDO.renovacaoEstagio.getTempoEstagio()}</p>
                                 </div>
                                 <div class="form-outline mb-3">
@@ -226,12 +217,22 @@
                             </c:if>
                             <form class="needs-validation" novalidate accept-charset="utf-8" id="docenteForm" name="docenteForm" action="docenteController" method="post">
                                 <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="radioPedido" id="aceitarPedido" value="aceito" required>
+                                    <input class="form-check-input" type="radio" name="radioPedido" id="aceitarPedido" value="aceito" required onclick="hideTextArea()">
                                     <label class="form-check-label" for="aceitarPedido">Aceitar</label>
                                 </div>
                                 <div class="form-check form-check-inline mb-3">
-                                    <input class="form-check-input" type="radio" name="radioPedido" id="rejeitarPedido" value="rejeitado" required>
+                                    <input class="form-check-input" type="radio" name="radioPedido" id="rejeitarPedido" value="rejeitado" required onclick="showTextArea()">
                                     <label class="form-check-label" for="rejeitarPedido">Rejeitar</label>
+                                </div>
+                                <div class="form-outline mb-3" id="textAreaDiv" hidden>
+                                    <label class="form-label" for="textAreaPedido">Justificativa</label>
+                                    <textarea class="form-control" id="textAreaPedido" name="textAreaPedido" required></textarea>
+                                    <div class="valid-feedback">
+                                        Perfeito!
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Ops! Informe uma justificativa para rejeitar esse pedido.
+                                    </div>
                                 </div>
                                 <div role="toolbar" style="text-align: right">
                                     <button class="btn btn-primary" type="submit" id="submitButtonDocenteAnalisaPedido" name="submitButtonDocenteAnalisaPedido" value="step3">Enviar</button>
@@ -282,7 +283,8 @@
         </div>
     </div>
 </div>
-
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
 </body>
 
 </html>

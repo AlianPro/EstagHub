@@ -15,9 +15,10 @@ public class DocenteMapperImpl implements DocenteMapper {
                 .senha(docenteCreationDTO.getSenha())
                 .siape(docenteCreationDTO.getSiape())
                 .isDocenteComissao(docenteCreationDTO.getIsDocenteComissao())
-                .departamento(docenteComissao.getDepartamento())
+                .departamento(docenteCreationDTO.getDepartamento())
                 .dataHoraCriacao(LocalDateTime.now())
                 .docenteResponsavelCriacao(docenteComissao)
+                .isActive(true)
                 .build();
     }
 }

@@ -19,12 +19,8 @@
     <!-- Bootstrap core JavaScript-->
     <script src="vendor/jquery/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
@@ -56,27 +52,13 @@
             $("#selectDocente").children().prop('disabled',false);
             $("#selectDocente").prop('hidden',false);
         }
-        function sendNextPage(idPedido, statusPedido){
-            $.ajax({
-                type: "POST",
-                url: "docenteController",
-                data: {
-                    buttonPedido: 'pedido',
-                    idPedido: idPedido,
-                    statusPedido: statusPedido
-                },
-                success: function (){
-                    return true;
-                }
-            });
-        }
         function logout(){
             $.ajax({
                 type: "POST",
                 url: "principalController",
-                cache: false,
+                async: false,
                 data: {
-                    buttonLogout: $('button[id^=buttonLogout]').val()
+                    buttonLogout: 'logout'
                 }
             });
         }
@@ -151,13 +133,16 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DOCENTE.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-
-
+                            <a class="dropdown-item" href="editarPerfilDocente.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -182,7 +167,7 @@
                 <div class="sw sw-theme-basic sw-justified">
                     <div class="tab-content">
                         <div class="tab-pane" style="display: block">
-                            <c:if test="${'NOVO' == NOVO_ESTAGIO.tipo.name()}">
+                            <c:if test="${'NOVO' == PEDIDO.tipo.name()}">
                                 <div class="form-floating mb-3">
                                     <label for="planoAtividadesAntigo">Download do Plano de Atividades:</label>
                                     <a id="planoAtividadesAntigo" href="${PLANO_ATIVIDADES_URL}">${PLANO_ATIVIDADES.nome}</a>
@@ -194,8 +179,8 @@
                             </c:if>
                             <form class="needs-validation" enctype="multipart/form-data" novalidate id="docenteForm" name="docenteForm" action="docenteController" method="post">
                                 <div class="form-floating mb-3">
-                                    <label for="planoAtividadesAssinado">Anexe o Plano de Atividades Assinado:</label>
-                                    <input id="planoAtividadesAssinado" name="planoAtividadesAssinado" required type="file" accept=".doc"/>
+                                    <label for="planoAtividadesAssinadoDocente">Anexe o Plano de Atividades Assinado:</label>
+                                    <input id="planoAtividadesAssinadoDocente" name="planoAtividadesAssinadoDocente" required type="file"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -204,8 +189,8 @@
                                     </div>
                                 </div>
                                 <div class="form-floating mb-3">
-                                    <label for="tceAssinado">Anexe o TCE assinado:</label>
-                                    <input id="tceAssinado" name="tceAssinado" required type="file" accept=".doc"/>
+                                    <label for="tceAssinadoDocente">Anexe o TCE assinado:</label>
+                                    <input id="tceAssinadoDocente" name="tceAssinadoDocente" required type="file"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -262,7 +247,8 @@
         </div>
     </div>
 </div>
-
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
 </body>
 
 </html>

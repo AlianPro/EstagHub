@@ -38,16 +38,6 @@ public class PedidoRepositoryImpl implements PedidoRepository {
     }
 
     @Override
-    public Boolean getPedidoByIdWhereSupervisorNotSet(Long numPedido) {
-        try {
-            Query queryCheckIfHasSupervisorPresent = em.createNativeQuery("Select * from Pedido where id= :id and id_supervisor is null");
-            queryCheckIfHasSupervisorPresent.setParameter("id", numPedido);
-            return queryCheckIfHasSupervisorPresent.getResultList().isEmpty();
-        }finally {
-            em.close();
-        }
-    }
-    @Override
     public Optional<Pedido> getPedidoByDiscente(Discente discente, TipoPedido tipoPedido) {
         try{
             TypedQuery<Pedido> queryGetPedidoByDiscenteName = em.createQuery("Select p from Pedido p where p.discente = :discente and p.tipo = :tipo and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class);
@@ -61,7 +51,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
 
     @Override
     public void addSupervisorNoPedido(Supervisor supervisor, String numPedido) {
-        Query query = em.createQuery("UPDATE Pedido set id_supervisor = :idSupervisor , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :idPedido");
+        Query query = em.createQuery("UPDATE Pedido set id_supervisor = :idSupervisor , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :idPedido and tipo = 'RENOVACAO'");
         query.setParameter("idSupervisor", supervisor.getId());
         query.setParameter("data_hora_ult_atualizacao", LocalDateTime.now());
         query.setParameter("idPedido", Long.parseLong(numPedido));
@@ -71,20 +61,20 @@ public class PedidoRepositoryImpl implements PedidoRepository {
         em.close();
     }
     @Override
-    public Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido) {
+    public List<Pedido> getAllPedidosOfDocenteComissao(Docente docente) {
         try{
-            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.discente = :discente and p.tipo = :tipo and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class);
-            query.setParameter("discente", discente);
-            query.setParameter("tipo", tipoPedido);
-            return query.getResultList().isEmpty();
+            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p where (p.docenteComissaoResponsavel = :idDocente or p.docenteComissaoResponsavel is null) and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class);
+            query.setParameter("idDocente", docente);
+            return query.getResultList();
         }finally {
             em.close();
         }
     }
     @Override
-    public List<Pedido> getAllPedidos() {
+    public List<Pedido> getAllRenovPedidosInStep1WithoutSupervisor() {
         try{
-            return em.createQuery("SELECT p FROM Pedido p where p.status <> 'NOVO_PEDIDO_FIM' and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class).getResultList();
+            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p where p.supervisor is null and p.tipo = 'RENOVACAO' and p.status = 'RENOVACAO_STEP1'", Pedido.class);
+            return query.getResultList();
         }finally {
             em.close();
         }
@@ -92,7 +82,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
     @Override
     public List<Pedido> getAllPedidosOfDocente(Docente docente) {
         try{
-            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.docenteOrientador = :id_docente_orientador and p.status <> 'NOVO_PEDIDO_FIM' and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class);
+            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.docenteOrientador = :id_docente_orientador and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class);
             query.setParameter("id_docente_orientador", docente);
             return query.getResultList();
         }finally {
@@ -102,7 +92,7 @@ public class PedidoRepositoryImpl implements PedidoRepository {
     @Override
     public List<Pedido> getAllPedidosOfSupervisor(Supervisor supervisor) {
         try{
-            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.supervisor = :supervisor and p.status <> 'NOVO_PEDIDO_FIM' and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class);
+            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.supervisor = :supervisor and p.status <> 'PEDIDO_ENCERRADO'", Pedido.class);
             query.setParameter("supervisor", supervisor);
             return query.getResultList();
         }finally {

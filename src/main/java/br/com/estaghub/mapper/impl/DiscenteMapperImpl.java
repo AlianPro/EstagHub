@@ -5,8 +5,6 @@ import br.com.estaghub.dto.DiscenteCreationDTO;
 import br.com.estaghub.dto.DiscenteNovoPedidoCreationDTO;
 import br.com.estaghub.dto.DiscenteRenovacaoPedidoCreationDTO;
 import br.com.estaghub.mapper.DiscenteMapper;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
 
 import java.time.LocalDateTime;
 

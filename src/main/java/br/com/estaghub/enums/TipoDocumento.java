@@ -12,12 +12,4 @@ public enum TipoDocumento {
         return tipo;
     }
 
-    public static TipoDocumento getInstance(int tipo) {
-        for (TipoDocumento td : values()){
-            if(td.getTipo() == tipo)
-                return td;
-        }
-        return null;
-    }
-
 }

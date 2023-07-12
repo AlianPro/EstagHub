@@ -1,15 +1,19 @@
 package br.com.estaghub.repository.impl;
 
 import br.com.estaghub.domain.Discente;
+import br.com.estaghub.domain.Docente;
 import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.enums.TipoPedido;
 import br.com.estaghub.repository.DiscenteRepository;
 import br.com.estaghub.util.CryptUtil;
 import br.com.estaghub.util.HibernateUtil;
+import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.Optional;
 
 public class DiscenteRepositoryImpl implements DiscenteRepository {
@@ -17,20 +21,29 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
 
     @Override
     public void criarDiscente(Discente discente) {
-        TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
-        query.setParameter("email", discente.getEmail());
-        if (query.getResultList().isEmpty()){
-            discente.setSenha(CryptUtil.encryptPassword(discente.getSenha()));
-            em.getTransaction().begin();
-            em.persist(discente);
-            em.getTransaction().commit();
-        }
+        discente.setSenha(CryptUtil.encryptPassword(discente.getSenha()));
+        em.getTransaction().begin();
+        em.persist(discente);
+        em.getTransaction().commit();
         em.close();
     }
     @Override
-    public Discente getDiscenteById(Long id) {
+    public Boolean checkIfPossibleToCreateDiscente(Discente discente) {
+        try{
+            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE (d.email = :email or d.matricula = :matricula) and d.isActive = 1", Discente.class);
+            query.setParameter("email", discente.getEmail());
+            query.setParameter("matricula", discente.getMatricula());
+            return query.getResultList().isEmpty();
+        }finally {
+            em.close();
+        }
+    }
+    @Override
+    public Optional<Discente> getDiscenteById(Long id) {
         try {
-            return em.find(Discente.class,id);
+            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.id = :id", Discente.class);
+            query.setParameter("id", id);
+            return Optional.ofNullable(query.getSingleResult());
         }finally {
             em.close();
         }
@@ -39,7 +52,7 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
     @Override
     public Boolean loginDiscente(String email, String senha) {
         try {
-            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
+            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email and d.isActive = 1", Discente.class);
             query.setParameter("email", email);
             if (!query.getResultList().isEmpty()){
                 return CryptUtil.checkPassword(senha, query.getSingleResult().getSenha());
@@ -53,23 +66,65 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
     @Override
     public Optional<Discente> getDiscenteByEmail(String email) {
         try {
-            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email", Discente.class);
+            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.email = :email and d.isActive = 1", Discente.class);
             query.setParameter("email", email);
-            return Optional.ofNullable(query.getSingleResult());
+            return query.getResultList().isEmpty()? Optional.empty(): Optional.ofNullable(query.getSingleResult());
         }finally {
             em.close();
         }
     }
     @Override
-    public Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido) {
+    public Optional<Discente> getDiscenteByMatricula(String matricula) {
         try {
-            TypedQuery<Pedido> query = em.createQuery("SELECT p FROM Pedido p WHERE p.id_discente = :id and p.tipo = :tipo", Pedido.class);
-            query.setParameter("id", discente.getId());
-            query.setParameter("tipo", tipoPedido);
-            return query.getResultList().size() > 0;
+            TypedQuery<Discente> query = em.createQuery("SELECT d FROM Discente d WHERE d.matricula = :matricula and d.isActive = 1", Discente.class);
+            query.setParameter("matricula", matricula);
+            return query.getResultList().isEmpty()? Optional.empty(): Optional.ofNullable(query.getSingleResult());
         }finally {
             em.close();
         }
+    }
+    @Override
+    public void editProfileDiscente(Discente discente) {
+        StringBuilder sql = new StringBuilder();
+        sql.append("UPDATE Discente set ");
+        if (Strings.isNotBlank(discente.getNome())){
+            sql.append("nome = :nome ,");
+        }
+        if (Strings.isNotBlank(discente.getMatricula())){
+            sql.append("matricula = :matricula ,");
+        }
+        if (Strings.isNotBlank(discente.getTelefone())){
+            sql.append("telefone = :telefone ,");
+        }
+        sql.append("data_hora_ult_atualizacao = :data_hora_ult_atualizacao ");
+        sql.append("WHERE id = :idDiscente");
+        Query query = em.createQuery(sql.toString());
+        if (Strings.isNotBlank(discente.getNome())){
+            query.setParameter("nome", discente.getNome());
+        }
+        if (Strings.isNotBlank(discente.getMatricula())){
+            query.setParameter("matricula", discente.getMatricula());
+        }
+        if (Strings.isNotBlank(discente.getTelefone())){
+            query.setParameter("telefone", discente.getTelefone());
+        }
+        query.setParameter("data_hora_ult_atualizacao", LocalDateTime.now());
+        query.setParameter("idDiscente", discente.getId());
+        em.getTransaction().begin();
+        query.executeUpdate();
+        em.getTransaction().commit();
+        em.close();
+    }
+    @Override
+    public void deleteDiscente(Discente discente) {
+        Query query = em.createQuery("UPDATE Discente set status = :status , data_hora_ult_atualizacao = :data_hora_ult_atualizacao WHERE id = :id");
+        query.setParameter("id", discente.getId());
+        query.setParameter("status", discente.getIsActive());
+        query.setParameter("data_hora_ult_atualizacao", LocalDateTime.now());
+        em.getTransaction().begin();
+        query.executeUpdate();
+        em.getTransaction().commit();
+        em.close();
     }
     @Override
     public void addInfoNovoPedidoInDiscente(Discente discente) {
@@ -83,6 +138,16 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
         query.setParameter("carga_horaria_cumprida", discente.getCargaHorariaCumprida());
         query.setParameter("curso_id", discente.getCurso().getId());
         query.setParameter("endereco", discente.getEndereco());
+        em.getTransaction().begin();
+        query.executeUpdate();
+        em.getTransaction().commit();
+        em.close();
+    }
+    @Override
+    public void changePasswordDiscente(String email, String novaSenha) {
+        Query query = em.createQuery("UPDATE Discente set senha = :senha WHERE email = :email and status = 1");
+        query.setParameter("email", email);
+        query.setParameter("senha", CryptUtil.encryptPassword(novaSenha));
         em.getTransaction().begin();
         query.executeUpdate();
         em.getTransaction().commit();

@@ -24,9 +24,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/locales/bootstrap-datepicker.pt-BR.min.js" integrity="sha512-mVkLPLQVfOWLRlC2ZJuyX5+0XrTlbW2cyAwyqgPkLGxhoaHNSWesYMlcUjX8X+k45YB8q90s88O7sos86636NQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" integrity="sha512-mSYUmp1HYZDFaVKK//63EcZq4iFWFjxSL+Z3T/aCt4IO9Cejm03q3NKKYN6pFQzY0SBOr8h+eCIAZHPXcpZaNw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
@@ -57,72 +54,74 @@
                     }, false);
                 });
             }
-            $('#dataInicioAditivo').datepicker({
-                format: "dd/mm/yyyy",
-                language: "pt-BR",
-                autoclose: true,
-                todayHighlight: true
-            });
-            $('#dataFimAditivo').datepicker({
+            $('input[id^=dataInicioAditivo], input[id^=dataFimAditivo]').datepicker({
                 format: "dd/mm/yyyy",
                 language: "pt-BR",
                 autoclose: true,
                 todayHighlight: true
             });
         });
-        function goToNextStep(){
-            let formLogin = document.getElementById('discenteForm');
-            if(formLogin) {
-                const forms = document.querySelectorAll('.needs-validation');
-                Array.prototype.slice.call(forms).forEach((formLogin) => {
-                    formLogin.addEventListener('submit', (event) => {
-                        if (!formLogin.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            return false;
-                        }else{
-                            return true;
-                        }
-                        formLogin.classList.add('was-validated');
-                    }, false);
-                });
-            }
+        function sendNextPage(tipoPedido){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                data: {
+                    buttonPedido: 'pedido',
+                    tipoPedido: tipoPedido
+                },
+                dataType: "json",
+                success: function (data){
+                    if('RENOVACAO_STEP4' === data.page){
+                        window.location.replace("emitirTermoAditivo.jsp");
+                    }
+                }
+            });
         }
         function logout(){
             $.ajax({
                 type: "POST",
                 url: "principalController",
+                async: false,
                 data: {
                     buttonLogout: 'logout'
-                },
-                sucess: function (){
-                    return true;
                 }
             });
         }
-        function hideTextAreaTermoAditivoPreenchido(){
-            $("#discenteForm").children().prop('disabled',false);
-            $("#discenteForm").prop('hidden',false);
-            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
-            $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
-            $("#termoAditivoAssinado").children().prop('disabled',true);
-            $("#termoAditivoAssinado").prop('hidden',true);
+        function hideTextAreaTermoAditivo(option){
+            if ('empresa' === option || 'branco' === option){
+                $("#discenteForm").children().prop('disabled',true);
+                $("#discenteForm").prop('hidden',true);
+                $("#termoAditivoAssinado").children().prop('disabled',false);
+                $("#termoAditivoAssinado").prop('hidden',false);
+            }else {
+                $("#discenteForm").children().prop('disabled',false);
+                $("#discenteForm").prop('hidden',false);
+                $("#termoAditivoAssinado").children().prop('disabled',true);
+                $("#termoAditivoAssinado").prop('hidden',true);
+            }
+            if ('empresa' === option || 'gerar' === option){
+                $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
+                $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
+            }else {
+                $("#modeloTermoAditivoUFRRJ").children().prop('disabled',false);
+                $("#modeloTermoAditivoUFRRJ").prop('hidden',false);
+            }
         }
-        function hideTextAreaTermoAditivoPreenchidoEmpresa(){
-            $("#discenteForm").children().prop('disabled',true);
-            $("#discenteForm").prop('hidden',true);
-            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',true);
-            $("#modeloTermoAditivoUFRRJ").prop('hidden',true);
-            $("#termoAditivoAssinado").children().prop('disabled',false);
-            $("#termoAditivoAssinado").prop('hidden',false);
-        }
-        function hideTextAreaTermoAditivoPreenchidoUFRRJ(){
-            $("#discenteForm").children().prop('disabled',true);
-            $("#discenteForm").prop('hidden',true);
-            $("#modeloTermoAditivoUFRRJ").children().prop('disabled',false);
-            $("#modeloTermoAditivoUFRRJ").prop('hidden',false);
-            $("#termoAditivoAssinado").children().prop('disabled',false);
-            $("#termoAditivoAssinado").prop('hidden',false);
+        function finishPedido(){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                async: false,
+                data: {
+                    submitButtonDiscenteFinalizar: 'finalizarPedido'
+                },
+                dataType: "json",
+                success: function (data){
+                    if (data.finished){
+                        window.location.replace("discente.jsp");
+                    }
+                }
+            });
         }
     </script>
 
@@ -156,60 +155,21 @@
         </div>
 
         <!-- Nav Item - Renovação de estágio Collapse Menu -->
-        <c:choose>
-            <c:when test="${NOVO_ESTAGIO == null}">
-                <c:choose>
-                    <c:when test="${'RENOVACAO_STEP3_JUSTIFICADO' == RENOVACAO_ESTAGIO.status.name() || 'RENOVACAO_STEP2' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'RENOVACAO_STEP3_REJEITADO' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'RENOVACAO_STEP4' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="emitirTermoAditivo.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'RENOVACAO_STEP4_DISCENTE_ASSINADO' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:when test="${'NOVO_PEDIDO_FIM' == RENOVACAO_ESTAGIO.status.name()}">
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="#">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:when>
-                    <c:otherwise>
-                        <li class="nav-item">
-                            <a class="nav-link collapsed" href="renovacaoEstagio.jsp">
-                                <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
-                                <span>Renovação de Estágio</span>
-                            </a>
-                        </li>
-                    </c:otherwise>
-                </c:choose>
-            </c:when>
-        </c:choose>
+        <li class="nav-item">
+            <c:if test="${NOVO_ESTAGIO == null}">
+                <div class="d-flex">
+                    <a class="nav-link collapsed btn" onclick="sendNextPage('RENOVACAO')">
+                        <i class="fas fa-fw bi bi-clipboard-plus-fill"></i>
+                        <span>Renovação de Estágio</span>
+                    </a>
+                    <c:if test="${RENOVACAO_ESTAGIO != null}">
+                        <a type="btn" style="padding-right: 15px; padding-top:17px;" href="#" data-toggle="modal" data-target="#finishModal">
+                            <img src="https://img.icons8.com/fluency/48/cancel.png" alt="cross-mark-emoji" width="16" height="16">
+                        </a>
+                    </c:if>
+                </div>
+            </c:if>
+        </li>
 
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
@@ -245,13 +205,16 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DISCENTE.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-
-
+                            <a class="dropdown-item" href="editarPerfilDiscente.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -276,15 +239,15 @@
                         <div class="tab-pane" style="display: block">
                             <div class="form-outline mb-3">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoEmpresa" value="empresa" required onclick="hideTextAreaTermoAditivoPreenchidoEmpresa()">
+                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoEmpresa" required onclick="hideTextAreaTermoAditivo('empresa')">
                                     <label class="form-check-label" for="termoAditivoEmpresa">Enviar Termo Aditivo Usando o Modelo da Empresa</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoBranco" value="branco" required onclick="hideTextAreaTermoAditivoPreenchidoUFRRJ()">
+                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoBranco" required onclick="hideTextAreaTermoAditivo('branco')">
                                     <label class="form-check-label" for="termoAditivoBranco">Enviar Termo Aditivo Usando o Modelo da UFRRJ em Branco</label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoGerar" value="gerar" required onclick="hideTextAreaTermoAditivoPreenchido()">
+                                    <input class="form-check-input" type="radio" name="radioTermoAditivo" id="termoAditivoGerar" required onclick="hideTextAreaTermoAditivo('gerar')">
                                     <label class="form-check-label" for="termoAditivoGerar">Gerar Termo Aditivo</label>
                                 </div>
                             </div>
@@ -295,7 +258,7 @@
                             <form class="needs-validation" enctype="multipart/form-data" novalidate id="termoAditivoAssinado" name="discenteForm" action="discenteController" method="post" hidden>
                                 <div class="form-floating mb-3">
                                     <label for="fileTCEAssinado">Anexe o Termo Aditivo Preenchido e Assinado:</label>
-                                    <input id="fileTCEAssinado" name="fileTermoAditivoAssinado" required type="file" accept=".doc, .docx, .pdf"/>
+                                    <input id="fileTCEAssinado" name="fileTermoAditivoAssinado" required type="file"/>
                                     <div class="valid-feedback">
                                         Perfeito!
                                     </div>
@@ -402,6 +365,27 @@
         </div>
     </div>
 
+    <!-- Finish Modal-->
+    <div class="modal fade" id="finishModal" tabindex="-1" role="dialog" aria-labelledby="finishModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="finishModalLabel">Finalizar pedido?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Selecione "Finalizar" abaixo se você realmente deseja finalizar esse pedido.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
+                    <button class="btn btn-primary" onclick="finishPedido()">Finalizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
 </body>
 
 </html>

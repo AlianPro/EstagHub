@@ -9,6 +9,7 @@ public class DepartamentoMapperImpl implements DepartamentoMapper {
     public Departamento toDocenteCreateDepartamento(DepartamentoCreationDTO departamentoCreationDTO) {
         return Departamento.builder().nome(departamentoCreationDTO.getNome())
                 .sigla(departamentoCreationDTO.getSigla())
+                .isActive(true)
                 .build();
     }
 }

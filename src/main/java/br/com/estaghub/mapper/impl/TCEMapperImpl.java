@@ -1,6 +1,6 @@
 package br.com.estaghub.mapper.impl;
 
-import br.com.estaghub.domain.TCE;
+import br.com.estaghub.domain.embeddable.TCE;
 import br.com.estaghub.dto.TCECreationDTO;
 import br.com.estaghub.mapper.TCEMapper;
 

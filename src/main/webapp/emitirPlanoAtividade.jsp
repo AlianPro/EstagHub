@@ -20,12 +20,8 @@
     <!-- Bootstrap core JavaScript-->
     <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.3/dist/jquery.min.js"></script>
     <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-
     <!-- Core plugin JavaScript-->
     <script src="vendor/jquery-easing/jquery.easing.min.js"></script>
-
-    <!-- Custom scripts for all pages-->
-    <script src="js/sb-admin-2.min.js"></script>
     <!-- Bootstrap icons-->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.2/font/bootstrap-icons.css" rel="stylesheet" />
     <script>
@@ -44,33 +40,45 @@
                 });
             }
         });
-        function goToNextStep(){
-            let formLogin = document.getElementById('discenteForm');
-            if(formLogin) {
-                const forms = document.querySelectorAll('.needs-validation');
-                Array.prototype.slice.call(forms).forEach((formLogin) => {
-                    formLogin.addEventListener('submit', (event) => {
-                        if (!formLogin.checkValidity()) {
-                            event.preventDefault();
-                            event.stopPropagation();
-                            return false;
-                        }else{
-                            return true;
-                        }
-                        formLogin.classList.add('was-validated');
-                    }, false);
-                });
-            }
+        function sendNextPage(tipoPedido){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                data: {
+                    buttonPedido: 'pedido',
+                    tipoPedido: tipoPedido
+                },
+                dataType: "json",
+                success: function (data){
+                    if('PLANO_ATIVIDADES' === data.page){
+                        window.location.replace("emitirPlanoAtividade.jsp");
+                    }
+                }
+            });
         }
         function logout(){
             $.ajax({
                 type: "POST",
                 url: "principalController",
+                async: false,
                 data: {
                     buttonLogout: 'logout'
+                }
+            });
+        }
+        function finishPedido(){
+            $.ajax({
+                type: "POST",
+                url: "discenteController",
+                async: false,
+                data: {
+                    submitButtonDiscenteFinalizar: 'finalizarPedido'
                 },
-                sucess: function (){
-                    return true;
+                dataType: "json",
+                success: function (data){
+                    if (data.finished){
+                        window.location.replace("discente.jsp");
+                    }
                 }
             });
         }
@@ -106,88 +114,21 @@
 
             <!-- Nav Item - Novo estágio Collapse Menu -->
             <li class="nav-item">
-                <c:choose>
-                    <c:when test="${RENOVACAO_ESTAGIO == null}">
-                        <c:choose>
-                            <c:when test="${'NOVO_STEP1' == NOVO_ESTAGIO.status.name()}">
-                                <%--                    TODO tela para avisar q está esperando resposta do docente--%>
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP2' == NOVO_ESTAGIO.status.name()}">
-                                <%--TODO tela para avisar q está esperando resposta do docente--%>
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP2_REJEITADO' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="justificativaNovoEstagio.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP2_JUSTIFICADO' == NOVO_ESTAGIO.status.name()}">
-                                <%--TODO tela para avisar q está esperando resposta do docente--%>
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP3' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP3_DISCENTE_ASSINADO' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="assinarDocumentoDiscente.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP4' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP4_TCE' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirTCE.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_STEP4_ATIVIDADES_TCE' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="emitirPlanoAtividade.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:when test="${'NOVO_PEDIDO_FIM' == NOVO_ESTAGIO.status.name()}">
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="#">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:when>
-                            <c:otherwise>
-                                <a id="buttonNovoEstagio" class="nav-link collapsed" href="novoEstagio.jsp">
-                                    <i class="fas fa-fw bi bi-clipboard-fill"></i>
-                                    <span>Novo Estágio</span>
-                                </a>
-                            </c:otherwise>
-                        </c:choose>
-                    </c:when>
-                </c:choose>
+                <c:if test="${RENOVACAO_ESTAGIO == null}">
+                    <div class="d-flex">
+                        <a class="nav-link collapsed btn" onclick="sendNextPage('NOVO')">
+                            <i class="fas fa-fw bi bi-clipboard-fill"></i>
+                            <span>Novo Estágio</span>
+                        </a>
+                        <c:if test="${NOVO_ESTAGIO != null}">
+                            <a type="btn" style="padding-right: 15px; padding-top:17px;" href="#" data-toggle="modal" data-target="#finishModal">
+                                <img src="https://img.icons8.com/fluency/48/cancel.png" alt="cross-mark-emoji" width="16" height="16">
+                            </a>
+                        </c:if>
+                    </div>
+                </c:if>
             </li>
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -222,13 +163,16 @@
                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             <span class="mr-2 d-none d-lg-inline text-gray-600 small"><c:out value="${DISCENTE.nome}"></c:out></span>
                             <img class="img-profile rounded-circle"
-                                 src="assets/img/undraw_profile.svg">
+                                 src="assets/img/icon_profile.png">
                         </a>
                         <!-- Dropdown - User Information -->
                         <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
                              aria-labelledby="userDropdown">
-
-
+                            <a class="dropdown-item" href="editarPerfilDiscente.jsp">
+                                <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                Profile
+                            </a>
+                            <div class="dropdown-divider"></div>
                             <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                                 <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
                                 Logout
@@ -253,9 +197,9 @@
                         <div class="tab-pane" style="display: block">
                             <c:choose>
                                 <c:when test="${'NOVO_STEP4_PLANO_ATIVIDADES'== NOVO_ESTAGIO.status.name() || 'NOVO_STEP4_ATIVIDADES_TCE'== NOVO_ESTAGIO.status.name()}">
-                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
+                                    <form class="needs-validation" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
                                         <div class="form-floating mb-3">
-                                            <label for="erroDocumento">Erro(s) Identificado(s) pelo(a) Docente Orientador</label>
+                                            <label for="erroDocumento">Erro(s) Identificado(s) pelo(a) Docente Orientador(a)</label>
                                             <input class="form-control alert alert-danger" id="erroDocumento" type="text" name="erroDocumento" readonly disabled value="${NOVO_ESTAGIO.justificativaDocumentacao}"/>
                                         </div>
                                         <div class="form-floating mb-3">
@@ -272,18 +216,18 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="telefoneEmpresaPlanoAtividades">Telefone da Empresa</label>
-                                            <input class="form-control" id="telefoneEmpresaPlanoAtividades" type="text" name="telefoneEmpresa" value="${DOCUMENTO.planoAtividades.getTelefoneEmpresa()}"/>
+                                            <input class="form-control" id="telefoneEmpresaPlanoAtividades" type="text" name="telefoneEmpresa" pattern="^\+?[0-9\s()-]{10,}$" value="${DOCUMENTO.planoAtividades.getTelefoneEmpresa()}"/>
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="emailEmpresaPlanoAtividades">Email da Empresa</label>
                                             <input class="form-control" id="emailEmpresaPlanoAtividades" type="text" name="emailEmpresa" value="${DOCUMENTO.planoAtividades.getEmailEmpresa()}"/>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <label for="nomeSupervisorPlanoAtividades">Nome do Supervisor</label>
+                                            <label for="nomeSupervisorPlanoAtividades">Nome do(a) Supervisor(a)</label>
                                             <input class="form-control" id="nomeSupervisorPlanoAtividades" type="text" name="nomeSupervisor" value="${DOCUMENTO.planoAtividades.getNomeSupervisor()}"/>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <label for="formacaoSupervisorPlanoAtividades">Formação Profissional do Supervisor</label>
+                                            <label for="formacaoSupervisorPlanoAtividades">Formação Profissional do(a) Supervisor(a)</label>
                                             <input class="form-control" id="formacaoSupervisorPlanoAtividades" type="text" name="formacaoSupervisor" value="${DOCUMENTO.planoAtividades.getFormacaoSupervisor()}"/>
                                         </div>
                                         <div class="form-floating mb-3">
@@ -312,7 +256,7 @@
                                     </form>
                                 </c:when>
                                 <c:otherwise>
-                                    <form class="needs-validation" enctype="multipart/form-data" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
+                                    <form class="needs-validation" novalidate id="discenteForm" name="discenteForm" action="discenteController" method="post">
                                         <div class="form-floating mb-3">
                                             <label for="nomeEmpresa">Nome da Empresa</label>
                                             <input class="form-control" id="nomeEmpresa" type="text" name="nomeEmpresa" required placeholder="Nome Completo da Empresa"/>
@@ -345,7 +289,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="telefoneEmpresa">Telefone da Empresa</label>
-                                            <input class="form-control" id="telefoneEmpresa" type="text" name="telefoneEmpresa" required placeholder="(00) 00000-0000" pattern="^\+?[0-9\s()-]{10,}$"/>
+                                            <input class="form-control" id="telefoneEmpresa" type="tel" name="telefoneEmpresa" required placeholder="(00) 00000-0000" pattern="^\+?[0-9\s()-]{10,}$"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -355,7 +299,7 @@
                                         </div>
                                         <div class="form-floating mb-3">
                                             <label for="emailEmpresa">Email da Empresa</label>
-                                            <input class="form-control" id="emailEmpresa" type="text" name="emailEmpresa" required placeholder="name@example.com"/>
+                                            <input class="form-control" id="emailEmpresa" type="email" name="emailEmpresa" required placeholder="name@example.com"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
@@ -364,23 +308,23 @@
                                             </div>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <label for="nomeSupervisor">Nome do Supervisor</label>
-                                            <input class="form-control" id="nomeSupervisor" type="text" name="nomeSupervisor" required placeholder="Nome Completo do Supervisor"/>
+                                            <label for="nomeSupervisor">Nome do(a) Supervisor(a)</label>
+                                            <input class="form-control" id="nomeSupervisor" type="text" name="nomeSupervisor" required placeholder="Nome Completo do(a) Supervisor(a)"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
                                             <div class="invalid-feedback">
-                                                Ops! Informe o Nome do Supervisor.
+                                                Ops! Informe o Nome do(a) Supervisor(a).
                                             </div>
                                         </div>
                                         <div class="form-floating mb-3">
-                                            <label for="formacaoSupervisor">Formação Profissional do Supervisor</label>
-                                            <input class="form-control" id="formacaoSupervisor" type="text" name="formacaoSupervisor" required placeholder="Formação Profissional do Supervisor"/>
+                                            <label for="formacaoSupervisor">Formação Profissional do(a) Supervisor(a)</label>
+                                            <input class="form-control" id="formacaoSupervisor" type="text" name="formacaoSupervisor" required placeholder="Formação Profissional do(a) Supervisor(a)"/>
                                             <div class="valid-feedback">
                                                 Perfeito!
                                             </div>
                                             <div class="invalid-feedback">
-                                                Ops! Informe a Formação Profissional do Supervisor.
+                                                Ops! Informe a Formação Profissional do(a) Supervisor(a).
                                             </div>
                                         </div>
                                         <div class="form-floating mb-3">
@@ -469,6 +413,27 @@
         </div>
     </div>
 
+    <!-- Finish Modal-->
+    <div class="modal fade" id="finishModal" tabindex="-1" role="dialog" aria-labelledby="finishModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="finishModalLabel">Finalizar pedido?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Selecione "Finalizar" abaixo se você realmente deseja finalizar esse pedido.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Não</button>
+                    <button class="btn btn-primary" onclick="finishPedido()">Finalizar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+<!-- Custom scripts for all pages-->
+<script src="js/sb-admin-2.min.js"></script>
 </body>
 
 </html>

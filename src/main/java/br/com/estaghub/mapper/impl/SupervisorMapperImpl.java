@@ -1,7 +1,6 @@
 package br.com.estaghub.mapper.impl;
 
 import br.com.estaghub.domain.Supervisor;
-import br.com.estaghub.dto.EmpresaCreationDTO;
 import br.com.estaghub.dto.SupervisorCreationDTO;
 import br.com.estaghub.mapper.SupervisorMapper;
 

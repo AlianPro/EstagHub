@@ -3,7 +3,7 @@
     <persistence-unit name="estaghub" transaction-type="RESOURCE_LOCAL">
         <properties>
             <property name="javax.persistence.jdbc.url"
-                      value="jdbc:mysql://localhost/estaghub?useSSL=false&amp;createDatabaseIfNotExist=true&amp;serverTimezone=UTC" />
+                      value="jdbc:mysql://localhost/estaghub?useSSL=false&amp;autoReconnect=true&amp;createDatabaseIfNotExist=true&amp;serverTimezone=UTC" />
 
             <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver" />
             <property name="javax.persistence.jdbc.user" value="root" />
@@ -13,7 +13,6 @@
             <property name="hibernate.format_sql" value="true" />
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL8Dialect" />
             <property name="hibernate.hbm2ddl.auto" value="update" />
-            <property name="hibernate.connection.pool_size" value="200" />
 
         </properties>
     </persistence-unit>

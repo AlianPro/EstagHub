@@ -1,6 +1,6 @@
 package br.com.estaghub.mapper.impl;
 
-import br.com.estaghub.domain.TermoAditivo;
+import br.com.estaghub.domain.embeddable.TermoAditivo;
 import br.com.estaghub.dto.TermoAditivoCreationDTO;
 import br.com.estaghub.mapper.TermoAditivoMapper;
 

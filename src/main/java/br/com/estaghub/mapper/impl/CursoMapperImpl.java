@@ -9,6 +9,7 @@ public class CursoMapperImpl implements CursoMapper {
     public Curso toDocenteCreateCurso(CursoCreationDTO cursoCreationDTO) {
         return Curso.builder().nome(cursoCreationDTO.getNome())
                 .departamento(cursoCreationDTO.getDepartamento())
+                .isActive(true)
                 .build();
     }
 }

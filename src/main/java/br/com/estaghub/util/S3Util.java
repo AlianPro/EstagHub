@@ -17,7 +17,6 @@ import java.util.List;
 public class S3Util {
     public static String OUTPUT_FILE = "/home/alianpro/Documents/Projetos/estaghub/src/main/java/br/com/estaghub/docs/pedidos";
 
-
     public static void uploadFileS3(String accessKey, String secretKey, String bucketName, String nameFile) {
         try {
             AWSCredentials credentials = new BasicAWSCredentials(accessKey, secretKey);
@@ -72,7 +71,4 @@ public class S3Util {
         }
     }
 
-    public static String getContextParameter(HttpServletRequest req, String name) {
-        return req.getServletContext().getInitParameter(name);
-    }
 }

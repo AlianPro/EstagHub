@@ -7,10 +7,14 @@ import java.util.Optional;
 
 public interface DiscenteRepository {
     void criarDiscente(Discente discente);
+    Boolean checkIfPossibleToCreateDiscente(Discente discente);
     Boolean loginDiscente(String email, String senha);
     Optional<Discente> getDiscenteByEmail(String email);
-    Boolean checkIfDiscenteAlreadyHavePedido(Discente discente, TipoPedido tipoPedido);
+    void editProfileDiscente(Discente discente);
+    void deleteDiscente(Discente discente);
+    Optional<Discente> getDiscenteByMatricula(String matricula);
     void addInfoNovoPedidoInDiscente(Discente discente);
-    Discente getDiscenteById(Long id);
+    void changePasswordDiscente(String email, String novaSenha);
+    Optional<Discente> getDiscenteById(Long id);
 
 }

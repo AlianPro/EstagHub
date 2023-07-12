@@ -5,7 +5,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
+import javax.validation.constraints.NotBlank;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,17 +22,26 @@ public class Docente {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @NotBlank
     private String nome;
-    private String siape;
+    @NotBlank
     private String email;
+    @NotBlank
+    private String siape;
+    @NotBlank
     private String senha;
     @ManyToOne
-    @JoinColumn(name = "departamento_id")
+    @JoinColumn(name = "id_departamento")
     private Departamento departamento;
     @Column(name = "docente_comissao")
     private Boolean isDocenteComissao;
+    @Column(name = "status")
+    @ColumnDefault("true")
+    private Boolean isActive;
     @Column(name = "data_hora_criacao")
     private LocalDateTime dataHoraCriacao;
+    @Column(name = "data_hora_ult_atualizacao")
+    private LocalDateTime dataHoraUltimaAtualizacao;
     @ManyToOne
     @JoinColumn(name = "id_docente_responsavel_criacao")
     private Docente docenteResponsavelCriacao;
@@ -44,6 +55,22 @@ public class Docente {
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         docenteRepository.criarDocente(docente);
     }
+    public void updateDocente(Docente docente){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        docenteRepository.updateDocente(docente);
+    }
+    public void changePasswordDocente(String email, String novaSenha){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        docenteRepository.changePasswordDocente(email, novaSenha);
+    }
+    public void editProfileDocente(Docente docente){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        docenteRepository.editProfileDocente(docente);
+    }
+    public void deleteDocente(Docente docente){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        docenteRepository.deleteDocente(docente);
+    }
     public Boolean loginDocente(String email, String senha){
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         return docenteRepository.loginDocente(email,senha);
@@ -56,15 +83,19 @@ public class Docente {
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         return docenteRepository.getDocenteByEmail(email);
     }
+    public Boolean checkSiapeOfDocente(Docente docente){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        return docenteRepository.checkSiapeOfDocente(docente);
+    }
     public List<Docente> getAllDocentes(){
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         return docenteRepository.getAllDocentes();
     }
-    public List<Docente> getAllDocentesNoComissao(){
+    public List<Docente> getAllDocentesOutComissao(){
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
-        return docenteRepository.getAllDocentesNoComissao();
+        return docenteRepository.getAllDocentesOutComissao();
     }
-    public Docente getDocenteById(Long id){
+    public Optional<Docente> getDocenteById(Long id){
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         return docenteRepository.getDocenteById(id);
     }

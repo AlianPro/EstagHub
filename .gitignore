@@ -1,10 +1,7 @@
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
-!**/src/main/java/br/com/estaghub/docs/*.pdf#
-!**/src/main/java/br/com/estaghub/docs/*.doc#
-!**/src/main/java/br/com/estaghub/docs/pedidos/*.pdf
-!**/src/main/java/br/com/estaghub/docs/pedidos/*.doc
+!**/src/main/java/br/com/estaghub/docs/pedidos/
 !**/src/main/webapp/WEB-INF/web.xml
 !**/src/test/**/target/
 
