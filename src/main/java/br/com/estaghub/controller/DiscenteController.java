@@ -1,9 +1,6 @@
 package br.com.estaghub.controller;
 
-import br.com.estaghub.domain.Curso;
-import br.com.estaghub.domain.Discente;
-import br.com.estaghub.domain.Documento;
-import br.com.estaghub.domain.Pedido;
+import br.com.estaghub.domain.*;
 import br.com.estaghub.domain.embeddable.PlanoAtividades;
 import br.com.estaghub.domain.embeddable.RenovacaoEstagio;
 import br.com.estaghub.domain.embeddable.TCE;
@@ -53,11 +50,7 @@ public class DiscenteController extends HttpServlet {
             if ("editarDiscente".equals(req.getParameter("submitButtonEditDiscente"))) {
                 editDiscente(req, resp);
             }else if ("excluirDiscente".equals(req.getParameter("submitButtonExcluirDiscente"))) {
-                Discente currentDiscente = (Discente) req.getSession().getAttribute("DISCENTE");
-                currentDiscente.setIsActive(false);
-                currentDiscente.deleteDiscente(currentDiscente);
-                req.getSession().invalidate();
-                resp.getWriter().write("{\"excluirDiscente\": true}");
+                excluirDiscente(req, resp);
             }else if ("pedido".equals(req.getParameter("buttonPedido"))) {
                 visualizarPedido(req, resp);
             }else if ("justificativa".equals(req.getParameter("submitButtonDiscenteJustificativa2"))){
@@ -83,6 +76,31 @@ public class DiscenteController extends HttpServlet {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    private static void excluirDiscente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Discente currentDiscente = (Discente) req.getSession().getAttribute("DISCENTE");
+        currentDiscente.setIsActive(false);
+        currentDiscente.deleteDiscente(currentDiscente);
+        Pedido pedido = new Pedido();
+        Documento documento = new Documento();
+        if(pedido.getPedidoByDiscente(currentDiscente,TipoPedido.NOVO).isPresent()){
+            Pedido currentPedido = pedido.getPedidoByDiscente(currentDiscente, TipoPedido.NOVO).get();
+            pedido.changeStatusPedido(currentPedido.getId().toString(),StatusPedido.PEDIDO_ENCERRADO);
+            documento.getAllDocumentosFromThatPedido(currentPedido.getId()).forEach(currentDocumento -> {
+                DocumentoService.deleteFile(currentDocumento.getNome());
+                S3Util.deleteFileS3(ServletUtil.getContextParameter(req, "access-key"), ServletUtil.getContextParameter(req, "secret-key"), ServletUtil.getContextParameter(req, "estaghub-bucket"), currentDocumento.getNome());
+            });
+        }else if(pedido.getPedidoByDiscente(currentDiscente,TipoPedido.RENOVACAO).isPresent()){
+            Pedido currentPedido = pedido.getPedidoByDiscente(currentDiscente, TipoPedido.RENOVACAO).get();
+            pedido.changeStatusPedido(currentPedido.getId().toString(),StatusPedido.PEDIDO_ENCERRADO);
+            documento.getAllDocumentosFromThatPedido(currentPedido.getId()).forEach(currentDocumento -> {
+                DocumentoService.deleteFile(currentDocumento.getNome());
+                S3Util.deleteFileS3(ServletUtil.getContextParameter(req, "access-key"), ServletUtil.getContextParameter(req, "secret-key"), ServletUtil.getContextParameter(req, "estaghub-bucket"), currentDocumento.getNome());
+            });
+        }
+        req.getSession().invalidate();
+        resp.getWriter().write("{\"excluirDiscente\": true}");
     }
 
     private static void editDiscente(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -222,23 +240,30 @@ public class DiscenteController extends HttpServlet {
             justificativa = req.getParameter("textAreaJustificativa");
         }
         HttpSession session = req.getSession();
+        Discente discenteSession = (Discente) req.getSession().getAttribute("DISCENTE");
         Pedido pedido = new Pedido();
         if ("NOVO".equals(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getTipo().name())){
-            justificativaDiscente(justificativa, session, pedido,"NOVO_ESTAGIO", TipoPedido.NOVO, StatusPedido.NOVO_STEP1, StatusPedido.NOVO_STEP2_JUSTIFICADO);
+            justificativaDiscente(req, justificativa, session, pedido,"NOVO_ESTAGIO", StatusPedido.NOVO_STEP1, StatusPedido.NOVO_STEP2_JUSTIFICADO, discenteSession);
         }else{
-            justificativaDiscente(justificativa, session, pedido, "RENOVACAO_ESTAGIO", TipoPedido.RENOVACAO, StatusPedido.RENOVACAO_STEP1, StatusPedido.RENOVACAO_STEP3_JUSTIFICADO);
+            justificativaDiscente(req, justificativa, session, pedido, "RENOVACAO_ESTAGIO", StatusPedido.RENOVACAO_STEP1, StatusPedido.RENOVACAO_STEP3_JUSTIFICADO, discenteSession);
         }
         req.getRequestDispatcher(SUCESS_DISCENTE).forward(req, resp);
     }
 
-    private static void justificativaDiscente(String justificativa, HttpSession session, Pedido pedido, String nomePedido, TipoPedido tipoPedido, StatusPedido primeiroStatusPedido, StatusPedido segundoStatusPedido) {
+    private static void justificativaDiscente(HttpServletRequest req, String justificativa, HttpSession session, Pedido pedido, String nomePedido, StatusPedido primeiroStatusPedido, StatusPedido segundoStatusPedido, Discente discente) {
         pedido.changeJustificativaDiscentePedido(session.getAttribute("ID_PEDIDO").toString(), justificativa);
-        if (!Strings.isNotBlank(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getJustificativaDocente())){
+        if (Strings.isBlank(pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString())).getJustificativaDocente())){
             pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),primeiroStatusPedido);
-            session.setAttribute(nomePedido, pedido.getPedidoByDiscente((Discente) session.getAttribute("DISCENTE"), tipoPedido).get());
+            Pedido currentPedido = pedido.getPedidoById((Long) session.getAttribute("ID_PEDIDO"));
+            session.setAttribute(nomePedido, currentPedido);
+            if ("NOVO".equals(currentPedido.getTipo().name())){
+                new Docente().getAllDocentesOfComissaoFromThisDepartamento(discente.getCurso().getDepartamento()).forEach(docente -> EmailService.sendInfoAboutPedido(req,docente.getEmail(), session.getAttribute("ID_PEDIDO").toString(),"O pedido <strong>#" + session.getAttribute("ID_PEDIDO").toString() + "</strong> do(a) discente <strong>" + discente.getNome() + "</strong> precisa da avaliação de um(a) integrante da comissão!"));
+            }
         }else{
             pedido.changeStatusPedido(session.getAttribute("ID_PEDIDO").toString(),segundoStatusPedido);
-            session.setAttribute(nomePedido, pedido.getPedidoByDiscente((Discente) session.getAttribute("DISCENTE"), tipoPedido).get());
+            Pedido currentPedido = pedido.getPedidoById((Long) session.getAttribute("ID_PEDIDO"));
+            session.setAttribute(nomePedido, currentPedido);
+            EmailService.sendInfoAboutPedido(req,currentPedido.getDocenteComissaoResponsavel().getEmail(), session.getAttribute("ID_PEDIDO").toString(),"O pedido <strong>#" + session.getAttribute("ID_PEDIDO").toString() + "</strong> do(a) discente <strong>" + discente.getNome() + "</strong> precisa da sua avaliação!");
         }
     }
 
@@ -662,6 +687,7 @@ public class DiscenteController extends HttpServlet {
                 session.setAttribute("NOVO_ESTAGIO",pedido.getPedidoByDiscente((Discente)session.getAttribute("DISCENTE"), TipoPedido.NOVO).get());
                 req.getRequestDispatcher(SUCESS_DISCENTE).forward(req, resp);
                 EmailService.sendInfoAboutPedido(req,discenteSession.getEmail(), pedidoToBeCreated.getId().toString(),"Seu pedido <strong>#" + pedidoToBeCreated.getId() + "</strong> foi realizado com sucesso!");
+                new Docente().getAllDocentesOfComissaoFromThisDepartamento(discente.getCurso().getDepartamento()).forEach(docente -> EmailService.sendInfoAboutPedido(req,docente.getEmail(), pedidoToBeCreated.getId().toString(),"O pedido <strong>#" + pedidoToBeCreated.getId() + "</strong> do(a) discente <strong>" + discenteSession.getNome() + "</strong> precisa da avaliação de um(a) integrante da comissão!"));
             }
         }catch (Exception e){
             e.printStackTrace();

@@ -22,6 +22,7 @@ public class DiscenteRepositoryImpl implements DiscenteRepository {
     @Override
     public void criarDiscente(Discente discente) {
         discente.setSenha(CryptUtil.encryptPassword(discente.getSenha()));
+        discente.setIsActive(true);
         em.getTransaction().begin();
         em.persist(discente);
         em.getTransaction().commit();

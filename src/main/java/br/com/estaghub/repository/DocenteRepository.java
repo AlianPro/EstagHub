@@ -1,5 +1,6 @@
 package br.com.estaghub.repository;
 
+import br.com.estaghub.domain.Departamento;
 import br.com.estaghub.domain.Docente;
 
 import java.util.List;
@@ -16,6 +17,7 @@ public interface DocenteRepository {
     Optional<Docente> getDocenteByEmail(String email);
     List<Docente> getAllDocentes();
     List<Docente> getAllDocentesOutComissao();
+    List<Docente> getAllDocentesOfComissaoFromThisDepartamento(Departamento departamento);
     Optional<Docente> getDocenteById(Long id);
     void changePasswordDocente(String email, String novaSenha);
 }

@@ -1,6 +1,7 @@
 package br.com.estaghub.controller;
 
 import br.com.estaghub.domain.Discente;
+import br.com.estaghub.domain.Docente;
 import br.com.estaghub.domain.Pedido;
 import br.com.estaghub.domain.Supervisor;
 import br.com.estaghub.enums.StatusPedido;
@@ -52,6 +53,7 @@ public class SupervisorController extends HttpServlet {
                 Pedido pedidoToBeEvaluated = pedido.getPedidoById(Long.parseLong(session.getAttribute("ID_PEDIDO").toString()));
                 req.getRequestDispatcher(SUCESS_SUPERVISOR).forward(req,resp);
                 EmailService.sendInfoAboutPedido(req,pedidoToBeEvaluated.getDiscente().getEmail(), pedidoToBeEvaluated.getId().toString(),"O seu pedido <strong>#" + pedidoToBeEvaluated.getId() + "</strong> recebeu uma atualização, verifique o sistema!");
+                new Docente().getAllDocentesOfComissaoFromThisDepartamento(pedidoToBeEvaluated.getDiscente().getCurso().getDepartamento()).forEach(docente -> EmailService.sendInfoAboutPedido(req,docente.getEmail(), session.getAttribute("ID_PEDIDO").toString(),"O pedido <strong>#" + session.getAttribute("ID_PEDIDO").toString() + "</strong> do(a) discente <strong>" + pedidoToBeEvaluated.getDiscente().getNome() + "</strong> precisa da avaliação de um(a) integrante da comissão!"));
             }
         }catch (Exception e){
             e.printStackTrace();

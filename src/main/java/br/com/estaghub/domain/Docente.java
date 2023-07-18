@@ -95,6 +95,10 @@ public class Docente {
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         return docenteRepository.getAllDocentesOutComissao();
     }
+    public List<Docente> getAllDocentesOfComissaoFromThisDepartamento(Departamento departamento){
+        DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
+        return docenteRepository.getAllDocentesOfComissaoFromThisDepartamento(departamento);
+    }
     public Optional<Docente> getDocenteById(Long id){
         DocenteRepositoryImpl docenteRepository = new DocenteRepositoryImpl();
         return docenteRepository.getDocenteById(id);

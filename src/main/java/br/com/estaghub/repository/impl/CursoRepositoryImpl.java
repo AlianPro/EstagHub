@@ -23,6 +23,7 @@ public class CursoRepositoryImpl implements CursoRepository {
 
     @Override
     public void criarCurso(Curso curso) {
+        curso.setIsActive(true);
         em.getTransaction().begin();
         em.persist(curso);
         em.getTransaction().commit();

@@ -21,6 +21,7 @@ public class SupervisorRepositoryImpl implements SupervisorRepository {
         empresa.criarEmpresa(empresa);
         supervisor.setEmpresa(empresa);
         supervisor.setSenha(CryptUtil.encryptPassword(supervisor.getSenha()));
+        supervisor.setIsActive(true);
         em.getTransaction().begin();
         em.persist(supervisor);
         em.getTransaction().commit();
@@ -30,6 +31,7 @@ public class SupervisorRepositoryImpl implements SupervisorRepository {
     public void vincularEmpresa(Supervisor supervisor, String cnpjEmpresaVinculada) {
         supervisor.setEmpresa(new Empresa().getEmpresaByCnpj(cnpjEmpresaVinculada).get());
         supervisor.setSenha(CryptUtil.encryptPassword(supervisor.getSenha()));
+        supervisor.setIsActive(true);
         em.getTransaction().begin();
         em.persist(supervisor);
         em.getTransaction().commit();

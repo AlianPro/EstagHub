@@ -1,5 +1,6 @@
 package br.com.estaghub.repository.impl;
 
+import br.com.estaghub.domain.Departamento;
 import br.com.estaghub.domain.Docente;
 import br.com.estaghub.repository.DocenteRepository;
 import br.com.estaghub.util.CryptUtil;
@@ -20,6 +21,7 @@ public class DocenteRepositoryImpl implements DocenteRepository {
     @Override
     public void criarDocente(Docente docente) {
         docente.setSenha(CryptUtil.encryptPassword(docente.getSenha()));
+        docente.setIsActive(true);
         em.getTransaction().begin();
         em.persist(docente);
         em.getTransaction().commit();
@@ -185,6 +187,16 @@ public class DocenteRepositoryImpl implements DocenteRepository {
     public List<Docente> getAllDocentesOutComissao() {
         try {
             return em.createQuery("SELECT d FROM Docente d where d.isDocenteComissao <> 1 and d.isActive = 1", Docente.class).getResultList();
+        }finally {
+            em.close();
+        }
+    }
+    @Override
+    public List<Docente> getAllDocentesOfComissaoFromThisDepartamento(Departamento departamento) {
+        try {
+            TypedQuery<Docente> query = em.createQuery("SELECT d FROM Docente d where d.isDocenteComissao = 1 and d.departamento = :departamento and d.isActive = 1", Docente.class);
+            query.setParameter("departamento", departamento);
+            return query.getResultList();
         }finally {
             em.close();
         }

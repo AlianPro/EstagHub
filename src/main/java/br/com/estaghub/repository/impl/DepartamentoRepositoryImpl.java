@@ -17,6 +17,7 @@ public class DepartamentoRepositoryImpl implements DepartamentoRepository {
 
     @Override
     public void criarDepartamento(Departamento departamento) {
+        departamento.setIsActive(true);
         em.getTransaction().begin();
         em.persist(departamento);
         em.getTransaction().commit();
